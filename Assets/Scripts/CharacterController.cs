@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using System;
 
 public class CharacterController : MonoBehaviour {
     public TextMeshProUGUI inputText;
@@ -15,22 +16,48 @@ public class CharacterController : MonoBehaviour {
     }
 
     private void OnTextInput(char character) {
-        switch (character) {
-            case '\b':
-                if (currentInput.Length > 0) {
-                    currentInput = currentInput.Remove(currentInput.Length - 1);
-                }
-                Debug.Log($"BACKSPACE -> {currentInput}");
-                break;
-            case '\t':
-            case '\r':
-            case ' ':
-            case '\n': // TODO: Handle submit
-                break; // TODO: Create list of allowed characters instead of ignoring certain ones
-            default:
-                currentInput += character;
-                Debug.Log($"INPUT ({character}) -> {currentInput}");
-                break;
+        if (Char.IsLetter(character)) {
+            this.TypeCharacter(Char.ToUpper(character));
+        } else if (character == '\b') {
+            this.Backspace();
+        } else if (character == '\n') {
+            this.Submit();
         }
+    }
+
+    /// <summary>
+    /// Add character to current input
+    /// </summary>
+    /// <param name="character">The character to add</param>
+    public void TypeCharacter(char character) {
+            currentInput += character;
+            Debug.Log($"INPUT ({character}) -> {currentInput}");
+            this.UpdateInputText();
+    }
+
+    /// <summary>
+    /// Remove last character from current input, if possible
+    /// </summary>
+    /// <returns>True if last character was removed, otherwise false</returns>
+    public bool Backspace() {
+        bool canBackspace = currentInput.Length > 0;
+        if (canBackspace) {
+            currentInput = currentInput.Remove(currentInput.Length - 1);
+            Debug.Log($"BACKSPACE -> {currentInput}");
+        }
+        this.UpdateInputText();
+        return canBackspace;
+    }
+
+    /// <summary>
+    /// Submit the current input and clear it
+    /// </summary>
+    public void Submit() {
+        Debug.Log($"SUBMIT -> ({currentInput})");
+        // TODO: Submit current input and clear it
+    }
+
+    private void UpdateInputText() {
+        inputText.text = currentInput;
     }
 }

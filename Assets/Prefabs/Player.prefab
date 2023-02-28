@@ -97,4 +97,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dff9cae208a1e841b558f29d73909df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputActions: {fileID: -944628639613478452, guid: 0ed009211e3384f4f8c47ca2468abe4b, type: 3}
+  inputText: {fileID: 0}
