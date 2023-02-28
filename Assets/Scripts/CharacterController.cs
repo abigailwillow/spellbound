@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class CharacterController : MonoBehaviour {
+    public TextMeshProUGUI inputText;
     private string currentInput;
 
     private void OnEnable() {
@@ -20,9 +22,11 @@ public class CharacterController : MonoBehaviour {
                 }
                 Debug.Log($"BACKSPACE -> {currentInput}");
                 break;
-            case '\n':
-                // TODO: Handle submit
-                break;
+            case '\t':
+            case '\r':
+            case ' ':
+            case '\n': // TODO: Handle submit
+                break; // TODO: Create list of allowed characters instead of ignoring certain ones
             default:
                 currentInput += character;
                 Debug.Log($"INPUT ({character}) -> {currentInput}");
