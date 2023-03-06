@@ -7,6 +7,16 @@ public class PlayerController : MonoBehaviour {
     public TextMeshProUGUI inputText;
     private string currentInput;
 
+    private void Awake() {
+        GameManager.Instance.Player = this;
+    }
+
+    private void Update() {
+        if (Keyboard.current.enterKey.wasPressedThisFrame) {
+            this.Submit();
+        }
+    }
+
     private void OnEnable() {
         Keyboard.current.onTextInput += OnTextInput;
     }
@@ -20,8 +30,6 @@ public class PlayerController : MonoBehaviour {
             this.TypeCharacter(Char.ToUpper(character));
         } else if (character == '\b') {
             this.Backspace();
-        } else if (character == '\n') {
-            this.Submit();
         }
     }
 
@@ -54,10 +62,10 @@ public class PlayerController : MonoBehaviour {
     /// </summary>
     public void Submit() {
         Debug.Log($"SUBMIT -> ({currentInput})");
-        // TODO: Submit current input and clear it
+        GameManager.Instance.Opponent.TakeDamage(currentInput.Length);
+        currentInput = "";
+        this.UpdateInputText();
     }
 
-    private void UpdateInputText() {
-        inputText.text = currentInput;
-    }
+    private void UpdateInputText() => inputText.text = currentInput;
 }
