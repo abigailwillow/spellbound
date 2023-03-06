@@ -181,7 +181,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0
+  m_text: 100
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -392,7 +392,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0
+  m_text: 100
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -671,10 +671,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb65ff3dddccd3841af0f59b3999679d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerHealthBar: {fileID: 0}
-  PlayerHealthText: {fileID: 0}
-  OpponentHealthBar: {fileID: 0}
-  OpponentHealthText: {fileID: 0}
+  PlayerHealthBar: {fileID: 1431051098}
+  PlayerHealthText: {fileID: 310625345}
+  OpponentHealthBar: {fileID: 256325185}
+  OpponentHealthText: {fileID: 200211924}
 --- !u!1 &976206253
 GameObject:
   m_ObjectHideFlags: 0
@@ -1080,5 +1080,24 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6474094083631751796, guid: 3fc62f9a599900a4caadbb56bea3b038, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 3fc62f9a599900a4caadbb56bea3b038, type: 3}
+--- !u!1 &6474094085232630311 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6474094083631751785, guid: 3fc62f9a599900a4caadbb56bea3b038, type: 3}
+  m_PrefabInstance: {fileID: 6474094085232630310}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6474094085232630312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6474094085232630311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eff85ea3819f62428387635608ed886, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputText: {fileID: 1954950241}

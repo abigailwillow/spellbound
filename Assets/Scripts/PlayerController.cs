@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 using TMPro;
 using System;
 
-public class CharacterController : MonoBehaviour {
+public class PlayerController : MonoBehaviour {
     public TextMeshProUGUI inputText;
     private string currentInput;
 
