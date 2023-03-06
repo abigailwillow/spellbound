@@ -10,14 +10,18 @@ public class OpponentController : MonoBehaviour {
     }
 
     public void TakeDamage(int damage) {
-        Debug.Log($"OPPONENT TOOK {damage} DAMAGE ({Health}/{MaxHealth})");
-        UserInterfaceManager.Instance.OpponentHealthBar.fillAmount = (float) this.Health / this.MaxHealth;
-        UserInterfaceManager.Instance.OpponentHealthText.text = $"{this.Health}/{this.MaxHealth}";
         this.Health -= damage;
         if (this.Health <= 0) {
             this.Die();
         }
+        this.UpdateUI();
+        Debug.Log($"OPPONENT TOOK {damage} DAMAGE ({Health}/{MaxHealth})");
     }
 
     public void Die() => Debug.Log("OPPONENT DIED");
+
+    private void UpdateUI() {
+        UserInterfaceManager.Instance.OpponentHealthBar.fillAmount = (float) this.Health / this.MaxHealth;
+        UserInterfaceManager.Instance.OpponentHealthText.text = $"{this.Health}/{this.MaxHealth}";
+    }
 }
