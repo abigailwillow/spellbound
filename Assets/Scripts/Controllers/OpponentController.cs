@@ -21,7 +21,7 @@ public class OpponentController : MonoBehaviour {
     public void Die() => Debug.Log("OPPONENT DIED");
 
     private void UpdateUI() {
-        UserInterfaceManager.Instance.OpponentHealthBar.fillAmount = (float) this.Health / this.MaxHealth;
+        UserInterfaceManager.Instance.OpponentHealthBar.value = (float) this.Health / this.MaxHealth;
         UserInterfaceManager.Instance.OpponentHealthText.text = $"{this.Health}/{this.MaxHealth}";
     }
 }

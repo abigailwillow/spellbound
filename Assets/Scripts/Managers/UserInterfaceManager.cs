@@ -4,9 +4,9 @@ using TMPro;
 
 public class UserInterfaceManager : MonoBehaviour {
     public static UserInterfaceManager Instance { get; private set; }
-    public Image PlayerHealthBar;
+    public Slider PlayerHealthBar;
     public TextMeshProUGUI PlayerHealthText;
-    public Image OpponentHealthBar;
+    public Slider OpponentHealthBar;
     public TextMeshProUGUI OpponentHealthText;
 
     private void Awake() {

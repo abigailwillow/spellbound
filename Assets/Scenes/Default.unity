@@ -685,9 +685,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb65ff3dddccd3841af0f59b3999679d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerHealthBar: {fileID: 0}
+  PlayerHealthBar: {fileID: 1290382304}
   PlayerHealthText: {fileID: 310625345}
-  OpponentHealthBar: {fileID: 0}
+  OpponentHealthBar: {fileID: 450241397}
   OpponentHealthText: {fileID: 200211924}
 --- !u!1 &665298963
 GameObject:
