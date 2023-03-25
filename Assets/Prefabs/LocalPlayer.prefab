@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6474094083631751798}
   - component: {fileID: 6474094085232630312}
   m_Layer: 0
-  m_Name: Player
+  m_Name: LocalPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -97,4 +97,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3eff85ea3819f62428387635608ed886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputText: {fileID: 0}
+  maxHealth: 100

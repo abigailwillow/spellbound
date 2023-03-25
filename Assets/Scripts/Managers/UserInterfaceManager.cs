@@ -29,14 +29,26 @@ public class UserInterfaceManager : MonoBehaviour {
 
     public void UpdatePlayerInput(string text) => localPlayerElements.inputText.text = text;
 
+    /// <summary>
+    /// Toggle a specific player panel on or off
+    /// </summary>
+    /// <param name="enabled">Whether to enable or disable the panel</param>
+    /// <param name="playerType">Which player's panel to enable or disable</param>
+    public void SetPlayerPanelActive(bool enabled, PlayerType playerType) {
+        PlayerElements playerElements = playerType == PlayerType.Local ? localPlayerElements : remotePlayerElements;
+        playerElements.panel.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
     private class PlayerElements {
         public PlayerElements(VisualElement playerPanel) {
+            this.panel = playerPanel;
             this.healthBar = playerPanel.Query<VisualElement>("HealthBar");
             this.healthFill = playerPanel.Query<VisualElement>("HealthFill");
             this.healthText = playerPanel.Query<Label>("HealthText");
             this.inputText = playerPanel.Query<Label>("InputText");
         }
 
+        public VisualElement panel;
         public VisualElement healthBar;
         public VisualElement healthFill;
         public Label healthText;

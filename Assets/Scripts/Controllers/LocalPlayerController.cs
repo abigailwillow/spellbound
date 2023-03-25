@@ -2,11 +2,10 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class LocalPlayerController : MonoBehaviour {
-    private string currentInput;
-
-    private void Awake() {
-        GameManager.Instance.Player = this;
+public class LocalPlayerController : BasePlayerController {
+    protected override void Awake() {
+        base.Awake();
+        this.playerType = PlayerType.Local;
     }
 
     private void Update() {
@@ -60,7 +59,7 @@ public class LocalPlayerController : MonoBehaviour {
     /// </summary>
     public void Submit() {
         Debug.Log($"SUBMIT -> ({currentInput})");
-        GameManager.Instance.Opponent.TakeDamage(currentInput.Length);
+        GameManager.instance.remotePlayer.TakeDamage(currentInput.Length);
         currentInput = "";
         this.UpdateInputText();
     }
