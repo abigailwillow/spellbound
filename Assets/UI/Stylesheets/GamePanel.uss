@@ -22,11 +22,11 @@
 
 .health-bar-fill {
     background-image: url('project://database/Assets/Sprites/HealthBarForeground.png?fileID=21300000&guid=4d9da6976204af641bebf9740459f68f&type=3#HealthBarForeground');
-    width: auto;
+    width: 100%;
     height: auto;
     flex-grow: 1;
     -unity-slice-right: 0;
-    transition-duration: 0.25s;
+    transition-duration: 500ms;
     transition-timing-function: ease-in-out;
 }
 
@@ -42,10 +42,8 @@
 }
 
 .input-text {
-    -unity-font: initial;
     font-size: 48px;
     -unity-text-align: middle-center;
-    -unity-font-style: normal;
     color: rgb(255, 255, 255);
     padding-left: 0;
     padding-right: 0;

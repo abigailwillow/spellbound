@@ -10,10 +10,10 @@
     </ui:VisualElement>
     <ui:VisualElement name="RemotePlayerPanel" class="player-panel" style="flex-grow: 0; width: 50%; padding-left: 64px; padding-right: 64px; padding-top: 32px; padding-bottom: 32px;">
         <ui:VisualElement name="HealthBar" class="health-bar">
-            <ui:VisualElement name="HealthFill" class="health-bar-fill" style="background-image: url(&apos;project://database/Assets/Sprites/HealthBarForeground.png?fileID=21300000&amp;guid=4d9da6976204af641bebf9740459f68f&amp;type=3#HealthBarForeground&apos;); width: auto; height: auto; flex-grow: 1; -unity-slice-right: 0; transition-duration: 0.25s; transition-timing-function: ease-in-out;">
+            <ui:VisualElement name="HealthFill" class="health-bar-fill" style="background-image: url(&apos;project://database/Assets/Sprites/HealthBarForeground.png?fileID=21300000&amp;guid=4d9da6976204af641bebf9740459f68f&amp;type=3#HealthBarForeground&apos;); height: auto; flex-grow: 1; -unity-slice-right: 0; transition-timing-function: ease-in-out;">
                 <ui:Label text="100/100" display-tooltip-when-elided="true" name="HealthText" class="health-text" style="flex-grow: 1; -unity-text-align: middle-center; font-size: 48px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; color: rgb(255, 255, 255);" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label display-tooltip-when-elided="true" name="InputText" class="input-text" style="-unity-font: initial; font-size: 48px; -unity-text-align: middle-center; -unity-font-style: normal; color: rgb(255, 255, 255); padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; flex-wrap: nowrap; white-space: nowrap; margin-top: 32px; margin-bottom: 32px;" />
+        <ui:Label display-tooltip-when-elided="true" name="InputText" class="input-text" style="font-size: 48px; -unity-text-align: middle-center; -unity-font-style: normal; color: rgb(255, 255, 255); padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; flex-wrap: nowrap; white-space: nowrap; margin-top: 32px; margin-bottom: 32px;" />
     </ui:VisualElement>
 </ui:UXML>
