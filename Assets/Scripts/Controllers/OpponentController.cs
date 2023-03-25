@@ -14,7 +14,7 @@ public class OpponentController : MonoBehaviour {
         if (this.Health <= 0) {
             this.Die();
         }
-        UserInterfaceManager.Instance.UpdatePlayerHealth(this.Health, this.MaxHealth);
+        UserInterfaceManager.instance.UpdatePlayerHealth(this.Health, this.MaxHealth, PlayerType.Local);
         Debug.Log($"OPPONENT TOOK {damage} DAMAGE ({Health}/{MaxHealth})");
     }
 

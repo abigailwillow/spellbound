@@ -65,5 +65,5 @@ public class PlayerController : MonoBehaviour {
         this.UpdateInputText();
     }
 
-    private void UpdateInputText() => UserInterfaceManager.Instance.UpdatePlayerInput(currentInput);
+    private void UpdateInputText() => UserInterfaceManager.instance.UpdatePlayerInput(currentInput);
 }
