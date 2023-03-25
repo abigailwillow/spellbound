@@ -1,10 +1,8 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using TMPro;
-using System;
 
 public class PlayerController : MonoBehaviour {
-    public TextMeshProUGUI inputText;
     private string currentInput;
 
     private void Awake() {
@@ -67,5 +65,5 @@ public class PlayerController : MonoBehaviour {
         this.UpdateInputText();
     }
 
-    private void UpdateInputText() => inputText.text = currentInput;
+    private void UpdateInputText() => UserInterfaceManager.Instance.UpdatePlayerInput(currentInput);
 }
