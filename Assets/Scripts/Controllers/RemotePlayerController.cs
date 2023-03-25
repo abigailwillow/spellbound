@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class OpponentController : MonoBehaviour {
+public class RemotePlayerController : MonoBehaviour {
     [SerializeField] private int MaxHealth = 100;
     public int Health { get; private set; }
 
@@ -14,7 +14,7 @@ public class OpponentController : MonoBehaviour {
         if (this.Health <= 0) {
             this.Die();
         }
-        UserInterfaceManager.instance.UpdatePlayerHealth(this.Health, this.MaxHealth, PlayerType.Local);
+        UserInterfaceManager.instance.UpdatePlayerHealth(this.Health, this.MaxHealth, PlayerType.Remote);
         Debug.Log($"OPPONENT TOOK {damage} DAMAGE ({Health}/{MaxHealth})");
     }
 

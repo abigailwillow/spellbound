@@ -17,22 +17,8 @@ public class UserInterfaceManager : MonoBehaviour {
         # endregion
 
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
-
-        localPlayerElements = new PlayerElements(
-            root.Query<VisualElement>("PlayerHealthBar"),
-            root.Query<VisualElement>("PlayerHealthFill"),
-            root.Query<Label>("PlayerHealthText"),
-            root.Query<Label>("PlayerInputText")
-        );
-
-        Debug.Log(localPlayerElements);
-
-        // remotePlayerElements = new PlayerInterfaceElements(
-        //     root.Query<VisualElement>("OpponentHealthBar"),
-        //     root.Query<VisualElement>("OpponentHealthFill"),
-        //     root.Query<Label>("OpponentHealthText"),
-        //     root.Query<Label>("OpponentInputText")
-        // );
+        localPlayerElements = new PlayerElements(root.Query<VisualElement>("LocalPlayerPanel"));
+        remotePlayerElements = new PlayerElements(root.Query<VisualElement>("RemotePlayerPanel"));
     }
 
     public void UpdatePlayerHealth(int health, int maxHealth, PlayerType playerType) {
@@ -43,12 +29,12 @@ public class UserInterfaceManager : MonoBehaviour {
 
     public void UpdatePlayerInput(string text) => localPlayerElements.inputText.text = text;
 
-    private struct PlayerElements {
-        public PlayerElements(VisualElement healthBar, VisualElement healthFill, Label healthText, Label inputText) {
-            this.healthBar = healthBar;
-            this.healthFill = healthFill;
-            this.healthText = healthText;
-            this.inputText = inputText;
+    private class PlayerElements {
+        public PlayerElements(VisualElement playerPanel) {
+            this.healthBar = playerPanel.Query<VisualElement>("HealthBar");
+            this.healthFill = playerPanel.Query<VisualElement>("HealthFill");
+            this.healthText = playerPanel.Query<Label>("HealthText");
+            this.inputText = playerPanel.Query<Label>("InputText");
         }
 
         public VisualElement healthBar;
