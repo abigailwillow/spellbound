@@ -27,7 +27,10 @@ public class UserInterfaceManager : MonoBehaviour {
         playerElements.healthText.text = $"{health}/{maxHealth}";
     }
 
-    public void UpdatePlayerInput(string text) => localPlayerElements.inputText.text = text;
+    public void UpdatePlayerInput(string text, PlayerType playerType) {
+        PlayerElements playerElements = playerType == PlayerType.Local ? localPlayerElements : remotePlayerElements;
+        playerElements.inputText.text = text;
+    }
 
     /// <summary>
     /// Toggle a specific player panel on or off

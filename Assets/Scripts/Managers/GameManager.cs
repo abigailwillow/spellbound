@@ -20,7 +20,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
         # endregion
 
-        this.localPlayer = Instantiate(localPlayerPrefab).GetComponent<LocalPlayerController>();
+        // PhotonNetwork.PrefabPool.Register(localPlayerPrefab);
+        // PhotonNetwork.PrefabPool.Register(remotePlayerPrefab);
 
         PhotonNetwork.ConnectUsingSettings();
     }
@@ -36,6 +37,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public override void OnConnected() => Debug.Log($"Connected to {PhotonNetwork.Server}");
 
     public override void OnJoinedRoom() {
+        this.localPlayer = Instantiate(localPlayerPrefab).GetComponent<LocalPlayerController>();
         if (PhotonNetwork.CurrentRoom.PlayerCount == 2) {
             this.InstantiateRemotePlayer();
         }

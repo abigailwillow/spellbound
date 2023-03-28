@@ -1,16 +1,19 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Photon.Pun;
 
 public class LocalPlayerController : BasePlayerController {
     protected override void Awake() {
-        base.Awake();
         this.playerType = PlayerType.Local;
+        base.Awake();
     }
 
     private void Update() {
         if (Keyboard.current.enterKey.wasPressedThisFrame) {
-            this.Submit();
+            this.Submit(currentInput);
+            this.currentInput = "";
+            this.UpdateInputText();
         }
     }
 
@@ -35,9 +38,9 @@ public class LocalPlayerController : BasePlayerController {
     /// </summary>
     /// <param name="character">The character to add</param>
     public void TypeCharacter(char character) {
-            currentInput += character;
-            Debug.Log($"INPUT ({character}) -> {currentInput}");
-            this.UpdateInputText();
+        currentInput += character;
+        Debug.Log($"INPUT ({character}) -> {currentInput}");
+        this.UpdateInputText();
     }
 
     /// <summary>
@@ -54,15 +57,10 @@ public class LocalPlayerController : BasePlayerController {
         return canBackspace;
     }
 
-    /// <summary>
-    /// Submit the current input and clear it
-    /// </summary>
-    public void Submit() {
-        Debug.Log($"SUBMIT -> ({currentInput})");
-        GameManager.instance.remotePlayer.TakeDamage(currentInput.Length);
-        currentInput = "";
-        this.UpdateInputText();
+    public override void Submit(string input) {
+        base.Submit(input);
+        photonView.RPC("Submit", RpcTarget.Others, input);
     }
 
-    private void UpdateInputText() => UserInterfaceManager.instance.UpdatePlayerInput(currentInput);
+    private void UpdateInputText() => UserInterfaceManager.instance.UpdatePlayerInput(currentInput, PlayerType.Local);
 }
