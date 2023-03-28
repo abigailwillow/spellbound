@@ -1,0 +1,81 @@
+name: Build
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+    - stable
+jobs:
+  build:
+    # Build and publish as a release using the latest tag's major and minor version and the amount of commits since the last version increment as the patch version
+    name: Build project
+    runs-on: ubuntu-latest
+    environment: production
+    permissions: write-all
+    env:
+      projectName: Spellbound
+    strategy:
+        matrix:
+          targetPlatform:
+            - StandaloneWindows64
+            - WebGL
+    steps:
+      - name: Checkout Repository
+        id: checkout
+        uses: actions/checkout@v3
+        with:
+          ref: stable
+          fetch-depth: 0
+        
+      - name: Cache Repository
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-${{ matrix.targetPlatform }}
+          restore-keys: Library-
+      
+      - name: Generate Semantic Version
+        id: version
+        uses: paulhatch/semantic-version@v5.0.3
+        with:
+          tag_prefix: ''
+          version_format: "${major}.${minor}.${increment}"
+          bump_each_commit: true
+      
+      - name: Build Project
+        id: build
+        uses: game-ci/unity-builder@v2.1.0
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}
+          buildName: ${{ env.projectName }}
+          versioning: Custom
+          version: ${{ steps.version.outputs.version_tag }}
+          
+      - name: Archive Build
+        id: archive
+        uses: thedoctor0/zip-release@main
+        with:
+          type: zip
+          filename: ../../${{ env.projectName }}-${{ steps.version.outputs.version_tag }}-${{ matrix.targetPlatform }}.zip
+          directory: build/${{ matrix.targetPlatform }}/
+          
+      - name: Create Release
+        id: release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ steps.version.outputs.version_tag }}
+          tag_name: ${{ steps.version.outputs.version_tag }}
+          prerelease: false
+          files: ${{ env.projectName }}-${{ steps.version.outputs.version_tag }}-${{ matrix.targetPlatform }}.zip
+          
+      - name: Publish
+        id: publish
+        uses: JamesIves/github-pages-deploy-action@v4
+        if: matrix.targetPlatform == 'WebGL'
+        with:
+          folder: build/WebGL/${{ env.projectName }}/
+          branch: webgl
