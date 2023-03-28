@@ -1,0 +1,56 @@
+:root {
+    flex-direction: row;
+}
+
+.player-panel {
+    flex-grow: 1;
+    width: 50%;
+    padding-left: 64px;
+    padding-right: 64px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+}
+
+.health-bar {
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    height: 96px;
+    background-image: url('project://database/Assets/Sprites/HealthBarBackground.png?fileID=21300000&guid=0b35d8d6522312c42a82b4d4fb79fa45&type=3#HealthBarBackground');
+}
+
+.health-bar-fill {
+    background-image: url('project://database/Assets/Sprites/HealthBarForeground.png?fileID=21300000&guid=4d9da6976204af641bebf9740459f68f&type=3#HealthBarForeground');
+    width: 100%;
+    height: auto;
+    flex-grow: 1;
+    -unity-slice-right: 0;
+    transition-duration: 500ms;
+    transition-timing-function: ease-in-out;
+}
+
+.health-text {
+    flex-grow: 1;
+    -unity-text-align: middle-center;
+    font-size: 48px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    color: rgb(255, 255, 255);
+}
+
+.input-text {
+    font-size: 48px;
+    -unity-text-align: middle-center;
+    color: rgb(255, 255, 255);
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
