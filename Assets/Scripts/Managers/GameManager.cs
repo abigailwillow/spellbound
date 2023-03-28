@@ -20,9 +20,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
         # endregion
 
-        // PhotonNetwork.PrefabPool.Register(localPlayerPrefab);
-        // PhotonNetwork.PrefabPool.Register(remotePlayerPrefab);
-
         PhotonNetwork.ConnectUsingSettings();
     }
 
