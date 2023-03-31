@@ -59,14 +59,14 @@ jobs:
         uses: actions/upload-pages-artifact@v1.0.8
         if: matrix.targetPlatform == 'WebGL'
         with:
-          path: build/${{ matrix.targetPlatform }}/
+          path: build/${{ matrix.targetPlatform }}/${{ env.projectName }}/
           
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v2.0.0
         if: matrix.targetPlatform == 'WebGL'
         
-      - name: Tag
+      - name: Add Tag to Commit
         id: tag
         uses: rickstaa/action-create-tag@v1.6.1
         with:
