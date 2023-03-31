@@ -52,12 +52,7 @@ jobs:
           buildName: ${{ env.projectName }}
           versioning: Custom
           version: ${{ steps.version.outputs.version_tag }}
-          
-      - name: Tag
-        id: tag
-        uses: rickstaa/action-create-tag@v1.6.1
-        with:
-          tag: ${{ steps.version.outputs.version_tag }}
+          unityVersion: 2021.3.21f1
           
       - name: Create Artifact for GitHub Pages
         id: artifact
@@ -70,3 +65,9 @@ jobs:
         id: deploy
         uses: actions/deploy-pages@v2.0.0
         if: matrix.targetPlatform == 'WebGL'
+        
+      - name: Tag
+        id: tag
+        uses: rickstaa/action-create-tag@v1.6.1
+        with:
+          tag: ${{ steps.version.outputs.version_tag }}
