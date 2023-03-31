@@ -52,7 +52,6 @@ jobs:
           buildName: ${{ env.projectName }}
           versioning: Custom
           version: ${{ steps.version.outputs.version_tag }}
-          unityVersion: 2021.3.21f1
           customParameters: -Development
           
       - name: Create Artifact for GitHub Pages
