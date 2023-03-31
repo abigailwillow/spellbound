@@ -16,7 +16,6 @@ jobs:
     strategy:
         matrix:
           targetPlatform:
-            - StandaloneWindows64
             - WebGL
     steps:
       - name: Checkout Repository
@@ -34,7 +33,7 @@ jobs:
           key: Library-${{ matrix.targetPlatform }}
           restore-keys: Library-
       
-      - name: Generate Semantic Version
+      - name: Version
         id: version
         uses: paulhatch/semantic-version@v5.0.3
         with:
@@ -55,27 +54,20 @@ jobs:
           versioning: Custom
           version: ${{ steps.version.outputs.version_tag }}
           
-      - name: Archive Build
-        id: archive
-        uses: thedoctor0/zip-release@main
+      - name: Tag
+        id: tag
+        uses: rickstaa/actions-create-tag@v1.6.1
         with:
-          type: zip
-          filename: ../../${{ env.projectName }}-${{ steps.version.outputs.version_tag }}-${{ matrix.targetPlatform }}.zip
-          directory: build/${{ matrix.targetPlatform }}/
+          tag: ${{ steps.version.outputs.version_tag }}
           
-      - name: Create Release
-        id: release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: ${{ steps.version.outputs.version_tag }}
-          tag_name: ${{ steps.version.outputs.version_tag }}
-          prerelease: false
-          files: ${{ env.projectName }}-${{ steps.version.outputs.version_tag }}-${{ matrix.targetPlatform }}.zip
-          
-      - name: Publish
-        id: publish
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Create Artifact for GitHub Pages
+        id: artifact
+        uses: actions/upload-pages-artifact@v1.0.8
         if: matrix.targetPlatform == 'WebGL'
         with:
-          folder: build/WebGL/${{ env.projectName }}/
-          branch: webgl
+          path: build/${{ matrix.targetPlatform }}/
+          
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v2.0.0
+        if: matrix.targetPlatform == 'WebGL'
