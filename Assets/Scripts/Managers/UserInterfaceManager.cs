@@ -49,7 +49,7 @@ public class UserInterfaceManager : MonoBehaviour {
     /// <param name="playerType">Which player's panel to enable or disable</param>
     public void SetPlayerPanelActive(bool enabled, PlayerType playerType) {
         PlayerElements playerElements = playerType == PlayerType.Local ? LocalPlayerElements : RemotePlayerElements;
-        playerElements.Panel.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
+        playerElements.Panel.style.visibility = enabled ? Visibility.Visible : Visibility.Hidden;
     }
 
     private class PlayerElements {
