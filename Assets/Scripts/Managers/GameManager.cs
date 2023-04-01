@@ -3,20 +3,20 @@ using Photon.Pun;
 using Photon.Realtime;
 
 public class GameManager : MonoBehaviourPunCallbacks {
-    public static GameManager instance { get; private set; }
-    [SerializeField] private GameObject localPlayerPrefab;
-    [SerializeField] private GameObject remotePlayerPrefab;
-    public LocalPlayerController localPlayer { get; private set; }
-    public RemotePlayerController remotePlayer { get; private set; }
-    private UserInterfaceManager userInterfaceManager;
+    public static GameManager Instance { get; private set; }
+    [SerializeField] private GameObject LocalPlayerPrefab;
+    [SerializeField] private GameObject RemotePlayerPrefab;
+    public PlayerController LocalPlayer { get; private set; }
+    public PlayerController RemotePlayer { get; private set; }
+    private UserInterfaceManager UserInterfaceManager;
 
     private void Awake() {
         # region Singleton
-        if (instance != null && instance != this) {
+        if (Instance != null && Instance != this) {
             Destroy(this.gameObject);
             return;
         } else {
-            instance = this;
+            Instance = this;
         }
         # endregion
 
@@ -24,9 +24,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
     }
 
     private void Start() {
-        this.userInterfaceManager = UserInterfaceManager.instance;
-        this.userInterfaceManager.SetPlayerPanelActive(false, PlayerType.Remote);
-        this.userInterfaceManager.SetPlayerPanelActive(true, PlayerType.Local);
+        this.UserInterfaceManager = UserInterfaceManager.instance;
+        this.UserInterfaceManager.SetPlayerPanelActive(false, PlayerType.Remote);
+        this.UserInterfaceManager.SetPlayerPanelActive(true, PlayerType.Local);
     }
 
     public override void OnConnectedToMaster() => PhotonNetwork.JoinRandomRoom();
@@ -34,20 +34,20 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public override void OnConnected() => Debug.Log($"Connected to {PhotonNetwork.Server}");
 
     public override void OnJoinedRoom() {
-        this.localPlayer = Instantiate(localPlayerPrefab).GetComponent<LocalPlayerController>();
+        this.InstantiatePlayer(PlayerType.Local);
         if (PhotonNetwork.CurrentRoom.PlayerCount == 2) {
-            this.InstantiateRemotePlayer();
+            this.InstantiatePlayer(PlayerType.Remote);
         }
         Debug.Log($"Joined room {PhotonNetwork.CurrentRoom.Name}");       
     }
 
     public override void OnPlayerEnteredRoom(Player remotePlayer) {
-        this.InstantiateRemotePlayer();
+        this.InstantiatePlayer(PlayerType.Remote);
         Debug.Log($"Remote player joined the room");
     }
 
     public override void OnPlayerLeftRoom(Player remotePlayer) {
-        this.DestroyRemotePlayer();
+        this.DestroyPlayer(PlayerType.Remote);
         Debug.Log($"Remote player left the room");
     }
 
@@ -56,14 +56,25 @@ public class GameManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 2 });
     }
 
-    public void InstantiateRemotePlayer() {
-        this.remotePlayer = Instantiate(remotePlayerPrefab).GetComponent<RemotePlayerController>();
-        this.userInterfaceManager.SetPlayerPanelActive(true, PlayerType.Remote);
+    private void InstantiatePlayer(PlayerType playerType) {
+        if (playerType == PlayerType.Local) {
+            this.LocalPlayer = Instantiate(LocalPlayerPrefab).GetComponent<PlayerController>();
+            this.UserInterfaceManager.SetPlayerPanelActive(true, PlayerType.Local);
+        } else if (playerType == PlayerType.Remote) {
+            this.RemotePlayer = Instantiate(RemotePlayerPrefab).GetComponent<PlayerController>();
+            this.UserInterfaceManager.SetPlayerPanelActive(true, PlayerType.Remote);
+        }
     }
 
-    public void DestroyRemotePlayer() {
-        Destroy(this.remotePlayer.gameObject);
-        this.remotePlayer = null;
-        this.userInterfaceManager.SetPlayerPanelActive(false, PlayerType.Remote);
+    private void DestroyPlayer(PlayerType playerType) {
+        if (playerType == PlayerType.Local) {
+            Destroy(this.LocalPlayer.gameObject);
+            this.LocalPlayer = null;
+            this.UserInterfaceManager.SetPlayerPanelActive(false, PlayerType.Local);
+        } else if (playerType == PlayerType.Remote) {
+            Destroy(this.RemotePlayer.gameObject);
+            this.RemotePlayer = null;
+            this.UserInterfaceManager.SetPlayerPanelActive(false, PlayerType.Remote);
+        }
     }
 }
