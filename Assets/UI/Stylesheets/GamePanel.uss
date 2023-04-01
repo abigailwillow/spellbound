@@ -54,3 +54,11 @@
     margin-top: 32px;
     margin-bottom: 32px;
 }
+
+#VersionLabel {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 255);
+}

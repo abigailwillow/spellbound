@@ -12,6 +12,8 @@ public class UserInterfaceManager : MonoBehaviour {
         this.RemotePlayerElements = new PlayerElements(root.Query<VisualElement>("RemotePlayerPanel"));
         this.SetPlayerPanelActive(true, PlayerType.Local);
         this.SetPlayerPanelActive(false, PlayerType.Remote);
+        Label version = root.Query<Label>("VersionLabel");
+        version.text += $"{Application.version}";
     }
 
     private void Start() {
