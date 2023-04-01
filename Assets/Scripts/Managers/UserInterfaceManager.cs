@@ -2,34 +2,44 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 public class UserInterfaceManager : MonoBehaviour {
-    public static UserInterfaceManager instance { get; private set; }
-    private PlayerElements localPlayerElements;
-    private PlayerElements remotePlayerElements;
+    private PlayerElements LocalPlayerElements;
+    private PlayerElements RemotePlayerElements;
+    private GameManager GameManager => GameManager.Instance;
 
     private void Awake() {
-        #region Singleton
-        if (instance != null && instance != this) {
-            Destroy(this.gameObject);
-            return;
-        } else {
-            instance = this;
-        }
-        # endregion
-
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
-        localPlayerElements = new PlayerElements(root.Query<VisualElement>("LocalPlayerPanel"));
-        remotePlayerElements = new PlayerElements(root.Query<VisualElement>("RemotePlayerPanel"));
+        this.LocalPlayerElements = new PlayerElements(root.Query<VisualElement>("LocalPlayerPanel"));
+        this.RemotePlayerElements = new PlayerElements(root.Query<VisualElement>("RemotePlayerPanel"));
+        this.SetPlayerPanelActive(true, PlayerType.Local);
+        this.SetPlayerPanelActive(false, PlayerType.Remote);
     }
 
-    public void UpdatePlayerHealth(int health, int maxHealth, PlayerType playerType) {
-        PlayerElements playerElements = playerType == PlayerType.Local ? localPlayerElements : remotePlayerElements;
-        playerElements.healthFill.style.width = new StyleLength(Length.Percent((float) health / maxHealth * 100));
-        playerElements.healthText.text = $"{health}/{maxHealth}";
+    private void Start() {
+        GameManager.OnPlayerInstantiated += player => {
+            this.SetPlayerPanelActive(true, player.PlayerType);
+            this.UpdatePlayerHealth(player, player.Health);
+            this.UpdatePlayerInput(player, player.InputText);
+
+            player.OnHealthUpdated += UpdatePlayerHealth;
+            player.OnInputTextUpdated += UpdatePlayerInput;
+        };
+
+        GameManager.OnPlayerDestroyed += player => {
+            this.SetPlayerPanelActive(false, player.PlayerType);
+            player.OnHealthUpdated -= UpdatePlayerHealth;
+            player.OnInputTextUpdated -= UpdatePlayerInput;
+        };
     }
 
-    public void UpdatePlayerInput(string text, PlayerType playerType) {
-        PlayerElements playerElements = playerType == PlayerType.Local ? localPlayerElements : remotePlayerElements;
-        playerElements.inputText.text = text;
+    private void UpdatePlayerHealth(PlayerController player, int health) {
+        PlayerElements playerElements = player.PlayerType == PlayerType.Local ? LocalPlayerElements : RemotePlayerElements;
+        playerElements.HealthFill.style.width = new StyleLength(Length.Percent((float) health / player.MaxHealth * 100));
+        playerElements.HealthText.text = $"{health}/{player.MaxHealth}";
+    }
+
+    private void UpdatePlayerInput(PlayerController player, string text) {
+        PlayerElements playerElements = player.PlayerType == PlayerType.Local ? LocalPlayerElements : RemotePlayerElements;
+        playerElements.InputText.text = text;
     }
 
     /// <summary>
@@ -38,23 +48,23 @@ public class UserInterfaceManager : MonoBehaviour {
     /// <param name="enabled">Whether to enable or disable the panel</param>
     /// <param name="playerType">Which player's panel to enable or disable</param>
     public void SetPlayerPanelActive(bool enabled, PlayerType playerType) {
-        PlayerElements playerElements = playerType == PlayerType.Local ? localPlayerElements : remotePlayerElements;
-        playerElements.panel.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
+        PlayerElements playerElements = playerType == PlayerType.Local ? LocalPlayerElements : RemotePlayerElements;
+        playerElements.Panel.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     private class PlayerElements {
         public PlayerElements(VisualElement playerPanel) {
-            this.panel = playerPanel;
-            this.healthBar = playerPanel.Query<VisualElement>("HealthBar");
-            this.healthFill = playerPanel.Query<VisualElement>("HealthFill");
-            this.healthText = playerPanel.Query<Label>("HealthText");
-            this.inputText = playerPanel.Query<Label>("InputText");
+            this.Panel = playerPanel;
+            this.HealthBar = playerPanel.Query<VisualElement>("HealthBar");
+            this.HealthFill = playerPanel.Query<VisualElement>("HealthFill");
+            this.HealthText = playerPanel.Query<Label>("HealthText");
+            this.InputText = playerPanel.Query<Label>("InputText");
         }
 
-        public VisualElement panel;
-        public VisualElement healthBar;
-        public VisualElement healthFill;
-        public Label healthText;
-        public Label inputText;
+        public VisualElement Panel;
+        public VisualElement HealthBar;
+        public VisualElement HealthFill;
+        public Label HealthText;
+        public Label InputText;
     }
 }

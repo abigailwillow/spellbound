@@ -3,16 +3,17 @@ using Photon.Pun;
 
 [RequireComponent(typeof(PhotonView))]
 public class PlayerController : MonoBehaviourPun {
-    [SerializeField] private int MaxHealth = 100;
+    [SerializeField] private int maxHealth = 100;
+    public int MaxHealth => this.maxHealth;
     public int Health { get; private set; }
     [SerializeField] private PlayerType playerType;
-    public PlayerType PlayerType { get => playerType; private set => playerType = value; }
+    public PlayerType PlayerType => this.playerType;
     public string InputText { get; private set; }
 
     # region Events
-    public delegate void InputTextUpdatedHandler(string input);
+    public delegate void InputTextUpdatedHandler(PlayerController self, string input);
     public event InputTextUpdatedHandler OnInputTextUpdated;
-    public delegate void HealthUpdatedHandler(int health);
+    public delegate void HealthUpdatedHandler(PlayerController self, int health);
     public event HealthUpdatedHandler OnHealthUpdated;
     # endregion
 
@@ -25,7 +26,7 @@ public class PlayerController : MonoBehaviourPun {
 
     [PunRPC] public void RPCTextInput(string character) {
         this.InputText += character;
-        this.OnInputTextUpdated?.Invoke(this.InputText);
+        this.OnInputTextUpdated?.Invoke(this, this.InputText);
         Debug.Log($"[{this.PlayerType}] TextInput -> {character} ({this.InputText})");
     }
 
@@ -35,6 +36,7 @@ public class PlayerController : MonoBehaviourPun {
         if (this.InputText.Length > 0) {
             this.InputText = this.InputText.Remove(this.InputText.Length - 1);
         }
+        this.OnInputTextUpdated?.Invoke(this, this.InputText);
 
         Debug.Log($"[{this.PlayerType}] Backspace -> {this.InputText}");
     }
@@ -45,6 +47,7 @@ public class PlayerController : MonoBehaviourPun {
 
     [PunRPC] public void RPCSubmit(string input) {
         this.InputText = string.Empty;
+        this.OnInputTextUpdated?.Invoke(this, this.InputText);
 
         Debug.Log($"[{this.PlayerType}] Submit -> {input}");
     }
@@ -54,7 +57,7 @@ public class PlayerController : MonoBehaviourPun {
         if (this.Health <= 0) {
             this.Die();
         }
-        this.OnHealthUpdated?.Invoke(this.Health);
+        this.OnHealthUpdated?.Invoke(this, this.Health);
 
         Debug.Log($"[{this.PlayerType}] TOOK {damage} DAMAGE ({this.Health}/{this.MaxHealth})");
     }
