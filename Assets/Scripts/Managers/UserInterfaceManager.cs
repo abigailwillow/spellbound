@@ -10,7 +10,7 @@ public class UserInterfaceManager : MonoBehaviour {
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
         this.LocalPlayerElements = new PlayerElements(root.Query<VisualElement>("LocalPlayerPanel"));
         this.RemotePlayerElements = new PlayerElements(root.Query<VisualElement>("RemotePlayerPanel"));
-        this.SetPlayerPanelActive(true, PlayerType.Local);
+        this.SetPlayerPanelActive(false, PlayerType.Local);
         this.SetPlayerPanelActive(false, PlayerType.Remote);
         Label version = root.Query<Label>("VersionLabel");
         version.text += $"{Application.version}";
@@ -26,10 +26,8 @@ public class UserInterfaceManager : MonoBehaviour {
             player.OnInputTextUpdated += UpdatePlayerInput;
         };
 
-        GameManager.OnPlayerDestroyed += player => {
-            this.SetPlayerPanelActive(false, player.PlayerType);
-            player.OnHealthUpdated -= UpdatePlayerHealth;
-            player.OnInputTextUpdated -= UpdatePlayerInput;
+        GameManager.OnPlayerDestroyed += playerType => {
+            this.SetPlayerPanelActive(false, playerType);
         };
     }
 

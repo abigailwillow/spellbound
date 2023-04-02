@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
@@ -6,14 +8,19 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public static GameManager Instance { get; private set; }
     [SerializeField] private GameObject LocalPlayerPrefab;
     [SerializeField] private GameObject RemotePlayerPrefab;
-    public PlayerController LocalPlayer { get; private set; }
-    public PlayerController RemotePlayer { get; private set; }
+    public List<PlayerController> Players = new List<PlayerController>(2);
+    public PlayerController LocalPlayer => Players.Find(player => player.PlayerType == PlayerType.Local);
+    public PlayerController RemotePlayer => Players.Find(player => player.PlayerType == PlayerType.Remote);
 
     # region Events
-    public delegate void PlayerInstantiatedHandler(PlayerController player);
-    public event PlayerInstantiatedHandler OnPlayerInstantiated;
-    public delegate void PlayerDestroyedHandler(PlayerController player);
-    public event PlayerDestroyedHandler OnPlayerDestroyed;
+    /// <summary>
+    /// Called when a player is instantiated
+    /// </summary>
+    public Action<PlayerController> OnPlayerInstantiated;
+    /// <summary>
+    /// Called when a player is destroyed
+    /// </summary>
+    public Action<PlayerType> OnPlayerDestroyed;
     # endregion
 
     private void Awake() {
@@ -34,20 +41,20 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public override void OnConnected() => Debug.Log($"Connected to {PhotonNetwork.Server}");
 
     public override void OnJoinedRoom() {
-        this.InstantiatePlayer(PlayerType.Local);
+        this.InstantiatePlayer(this.LocalPlayerPrefab);
         if (PhotonNetwork.CurrentRoom.PlayerCount == 2) {
-            this.InstantiatePlayer(PlayerType.Remote);
+            this.InstantiatePlayer(this.RemotePlayerPrefab);
         }
         Debug.Log($"Joined room {PhotonNetwork.CurrentRoom.Name}");       
     }
 
     public override void OnPlayerEnteredRoom(Player remotePlayer) {
-        this.InstantiatePlayer(PlayerType.Remote);
+        this.InstantiatePlayer(this.RemotePlayerPrefab);
         Debug.Log($"Remote player joined the room");
     }
 
     public override void OnPlayerLeftRoom(Player remotePlayer) {
-        this.DestroyPlayer(PlayerType.Remote);
+        this.DestroyPlayer(this.RemotePlayer);
         Debug.Log($"Remote player left the room");
     }
 
@@ -56,25 +63,29 @@ public class GameManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 2 });
     }
 
-    private void InstantiatePlayer(PlayerType playerType) {
-        if (playerType == PlayerType.Local) {
-            this.LocalPlayer = Instantiate(LocalPlayerPrefab).GetComponent<PlayerController>();
-            this.OnPlayerInstantiated?.Invoke(this.LocalPlayer);
-        } else if (playerType == PlayerType.Remote) {
-            this.RemotePlayer = Instantiate(RemotePlayerPrefab).GetComponent<PlayerController>();
-            this.OnPlayerInstantiated?.Invoke(this.RemotePlayer);
+    /// <summary>
+    /// Instantiates a player and adds it to the list of players
+    /// </summary>
+    /// <param name="prefab">The prefab to instantiate, must correspond to either the LocalPlayerPrefab or RemotePlayerPrefab</param>
+    private void InstantiatePlayer(GameObject prefab) {
+        if (prefab != this.LocalPlayerPrefab && prefab != this.RemotePlayerPrefab) {
+            Debug.LogError($"Prefab {prefab.name} is not a valid player prefab", this);
+            return;
         }
+
+        PlayerController player = Instantiate(prefab).GetComponent<PlayerController>();
+        this.Players.Add(player);
+        this.OnPlayerInstantiated?.Invoke(player);
     }
 
-    private void DestroyPlayer(PlayerType playerType) {
-        if (playerType == PlayerType.Local) {
-            this.OnPlayerDestroyed?.Invoke(this.LocalPlayer);
-            Destroy(this.LocalPlayer.gameObject);
-            this.LocalPlayer = null;
-        } else if (playerType == PlayerType.Remote) {
-            this.OnPlayerDestroyed?.Invoke(this.RemotePlayer);
-            Destroy(this.RemotePlayer.gameObject);
-            this.RemotePlayer = null;
-        }
+    /// <summary>
+    /// Destroys a player and removes it from the list of players
+    /// </summary>
+    /// <param name="player">The player to be destroyed</param>
+    private void DestroyPlayer(PlayerController player) {
+        PlayerType playerType = player.PlayerType;
+        this.Players.Remove(player);
+        Destroy(player.gameObject);
+        this.OnPlayerDestroyed?.Invoke(player.PlayerType);
     }
 }

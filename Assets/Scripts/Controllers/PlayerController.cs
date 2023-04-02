@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Photon.Pun;
 
@@ -11,10 +12,14 @@ public class PlayerController : MonoBehaviourPun {
     public string InputText { get; private set; }
 
     # region Events
-    public delegate void InputTextUpdatedHandler(PlayerController self, string input);
-    public event InputTextUpdatedHandler OnInputTextUpdated;
-    public delegate void HealthUpdatedHandler(PlayerController self, int health);
-    public event HealthUpdatedHandler OnHealthUpdated;
+    /// <summary>
+    /// Called when the player's input text is updated
+    /// </summary>
+    public Action<PlayerController, string> OnInputTextUpdated;
+    /// <summary>
+    /// Called when the player's health is updated
+    /// </summary>
+    public Action<PlayerController, int> OnHealthUpdated;
     # endregion
 
     private void Awake() {
