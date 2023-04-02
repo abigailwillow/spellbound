@@ -37,7 +37,7 @@ jobs:
       
       - name: Version
         id: version
-        uses: paulhatch/semantic-version@v5.0.3
+        uses: paulhatch/semantic-version@v5.0.0
         with:
           tag_prefix: ''
           version_format: "${major}.${minor}.${increment}"
