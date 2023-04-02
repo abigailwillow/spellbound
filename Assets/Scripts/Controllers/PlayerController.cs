@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
@@ -10,6 +11,7 @@ public class PlayerController : MonoBehaviourPun {
     [SerializeField] private PlayerType playerType;
     public PlayerType PlayerType => this.playerType;
     public string InputText { get; private set; }
+    public List<string> SubmittedStrings { get; private set; } = new List<string>();
     private PlayerController Opponent => this.PlayerType == PlayerType.Local ? GameManager.RemotePlayer : GameManager.LocalPlayer;
     private GameManager GameManager => GameManager.Instance;
 
@@ -17,11 +19,15 @@ public class PlayerController : MonoBehaviourPun {
     /// <summary>
     /// Called when the player's input text is updated
     /// </summary>
-    public Action<PlayerController, string> OnInputTextUpdated;
+    public Action<PlayerController, string> InputTextUpdated;
     /// <summary>
     /// Called when the player's health is updated
     /// </summary>
-    public Action<PlayerController, int> OnHealthUpdated;
+    public Action<PlayerController, int> HealthUpdated;
+    /// <summary>
+    /// Called when the player submits a word
+    /// </summary>
+    public Action<PlayerController, string> InputSubmitted;
     # endregion
 
     private void Awake() {
@@ -33,7 +39,7 @@ public class PlayerController : MonoBehaviourPun {
 
     [PunRPC] public void RPCTextInput(string character) {
         this.InputText += character;
-        this.OnInputTextUpdated?.Invoke(this, this.InputText);
+        this.InputTextUpdated?.Invoke(this, this.InputText);
         Debug.Log($"[{this.PlayerType}] TextInput -> {character} ({this.InputText})");
     }
 
@@ -43,7 +49,7 @@ public class PlayerController : MonoBehaviourPun {
         if (this.InputText?.Length > 0) {
             this.InputText = this.InputText.Remove(this.InputText.Length - 1);
         }
-        this.OnInputTextUpdated?.Invoke(this, this.InputText);
+        this.InputTextUpdated?.Invoke(this, this.InputText);
 
         Debug.Log($"[{this.PlayerType}] Backspace -> {this.InputText}");
     }
@@ -53,8 +59,14 @@ public class PlayerController : MonoBehaviourPun {
     public void Submit(string input) => this.photonView.RPC(nameof(RPCSubmit), RpcTarget.All, input);
 
     [PunRPC] public void RPCSubmit(string input) {
+        if (string.IsNullOrEmpty(input)) return;
+        
+        this.SubmittedStrings.Add(input);
+        this.InputSubmitted?.Invoke(this, input);
+
         this.InputText = string.Empty;
-        this.OnInputTextUpdated?.Invoke(this, this.InputText);
+        this.InputTextUpdated?.Invoke(this, this.InputText);
+
         this.Opponent.TakeDamage(input.Length);
 
         Debug.Log($"[{this.PlayerType}] Submit -> {input}");
@@ -65,10 +77,10 @@ public class PlayerController : MonoBehaviourPun {
         if (this.Health <= 0) {
             this.Die();
         }
-        this.OnHealthUpdated?.Invoke(this, this.Health);
+        this.HealthUpdated?.Invoke(this, this.Health);
 
-        Debug.Log($"[{this.PlayerType}] TOOK {damage} DAMAGE ({this.Health}/{this.MaxHealth})");
+        Debug.Log($"[{this.PlayerType}] Damage -> {damage} ({this.Health}/{this.MaxHealth})");
     }
 
-    private void Die() => Debug.Log($"{this.PlayerType} Player Died");
+    private void Die() => Debug.Log($"[{this.PlayerType}] Died");
 }

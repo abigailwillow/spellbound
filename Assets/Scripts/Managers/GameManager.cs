@@ -16,11 +16,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
     /// <summary>
     /// Called when a player is instantiated
     /// </summary>
-    public Action<PlayerController> OnPlayerInstantiated;
+    public Action<PlayerController> PlayerInstantiated;
     /// <summary>
     /// Called when a player is destroyed
     /// </summary>
-    public Action<PlayerType> OnPlayerDestroyed;
+    public Action<PlayerType> PlayerDestroyed;
     # endregion
 
     private void Awake() {
@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         PlayerController player = Instantiate(prefab).GetComponent<PlayerController>();
         this.Players.Add(player);
-        this.OnPlayerInstantiated?.Invoke(player);
+        this.PlayerInstantiated?.Invoke(player);
     }
 
     /// <summary>
@@ -86,6 +86,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         PlayerType playerType = player.PlayerType;
         this.Players.Remove(player);
         Destroy(player.gameObject);
-        this.OnPlayerDestroyed?.Invoke(player.PlayerType);
+        this.PlayerDestroyed?.Invoke(player.PlayerType);
     }
 }

@@ -2,6 +2,10 @@
     flex-direction: row;
 }
 
+.unity-text-element {
+    color: rgba(255, 255, 255, 255);
+}
+
 .player-panel {
     flex-grow: 1;
     width: 50%;
@@ -38,15 +42,20 @@
     padding-right: 0;
     padding-top: 0;
     padding-bottom: 0;
-    color: rgb(255, 255, 255);
+}
+
+.username-label {
+    font-size: 32px;
+    -unity-text-align: middle-center;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    margin-bottom: 8px;
 }
 
 .input-text {
     font-size: 48px;
     -unity-text-align: middle-center;
-    color: rgb(255, 255, 255);
-    padding-left: 0;
-    padding-right: 0;
     margin-left: 0;
     margin-right: 0;
     flex-wrap: nowrap;
@@ -55,10 +64,16 @@
     margin-bottom: 32px;
 }
 
+.history-label {
+    flex-grow: 1;
+    font-size: 32px;
+    -unity-text-align: upper-center;
+}
+
 #VersionLabel {
     position: absolute;
     left: 8px;
     bottom: 8px;
     font-size: 16px;
-    color: rgba(255, 255, 255, 255);
+    color: rgb(255, 255, 255);
 }
