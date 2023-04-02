@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviourPun {
     [SerializeField] private PlayerType playerType;
     public PlayerType PlayerType => this.playerType;
     public string InputText { get; private set; }
+    private PlayerController Opponent => this.PlayerType == PlayerType.Local ? GameManager.RemotePlayer : GameManager.LocalPlayer;
+    private GameManager GameManager => GameManager.Instance;
 
     # region Events
     /// <summary>
@@ -53,11 +55,12 @@ public class PlayerController : MonoBehaviourPun {
     [PunRPC] public void RPCSubmit(string input) {
         this.InputText = string.Empty;
         this.OnInputTextUpdated?.Invoke(this, this.InputText);
+        this.Opponent.TakeDamage(input.Length);
 
         Debug.Log($"[{this.PlayerType}] Submit -> {input}");
     }
 
-    private void TakeDamage(int damage) {
+    public void TakeDamage(int damage) {
         this.Health = Mathf.Max(0, this.Health - damage);
         if (this.Health <= 0) {
             this.Die();
