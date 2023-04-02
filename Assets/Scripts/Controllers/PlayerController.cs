@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviourPun {
     public void Backspace() => this.photonView.RPC(nameof(RPCBackspace), RpcTarget.All);
 
     [PunRPC] public void RPCBackspace() {
-        if (this.InputText.Length > 0) {
+        if (this.InputText?.Length > 0) {
             this.InputText = this.InputText.Remove(this.InputText.Length - 1);
         }
         this.OnInputTextUpdated?.Invoke(this, this.InputText);
