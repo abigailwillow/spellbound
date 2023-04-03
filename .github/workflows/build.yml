@@ -1,9 +1,5 @@
 name: Build
-on: 
-  workflow_dispatch:
-  push:
-    branches:
-    - stable
+on: workflow_dispatch
 concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
@@ -20,7 +16,6 @@ jobs:
         id: checkout
         uses: actions/checkout@v3
         with:
-          ref: stable
           fetch-depth: 0
         
       - name: Cache Repository
@@ -37,7 +32,6 @@ jobs:
         with:
           tag_prefix: ''
           version_format: "${major}.${minor}.${increment}"
-          bump_each_commit: true
       
       - name: Build Project
         id: build
