@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build:
-    name: Build ${{ env.projectName }}
+    name: Build and Publish Project
     runs-on: ubuntu-latest
     environment: production
     permissions: write-all
