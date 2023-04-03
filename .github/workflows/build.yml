@@ -15,10 +15,6 @@ jobs:
     permissions: write-all
     env:
       projectName: Spellbound
-    strategy:
-        matrix:
-          targetPlatform:
-            - WebGL
     steps:
       - name: Checkout Repository
         id: checkout
@@ -32,7 +28,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: Library
-          key: Library-${{ matrix.targetPlatform }}
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: Library-
       
       - name: Version
@@ -51,7 +47,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          targetPlatform: ${{ matrix.targetPlatform }}
+          targetPlatform: WebGL
           buildName: ${{ env.projectName }}
           versioning: Custom
           version: ${{ steps.version.outputs.version_tag }}
@@ -60,14 +56,12 @@ jobs:
       - name: Create Artifact for GitHub Pages
         id: artifact
         uses: actions/upload-pages-artifact@v1.0.8
-        if: matrix.targetPlatform == 'WebGL'
         with:
-          path: build/${{ matrix.targetPlatform }}/${{ env.projectName }}/
+          path: build/WebGL/${{ env.projectName }}/
           
       - name: Deploy to GitHub Pages
         id: deploy
         uses: actions/deploy-pages@v2.0.0
-        if: matrix.targetPlatform == 'WebGL'
         
       - name: Add Tag to Commit
         id: tag
