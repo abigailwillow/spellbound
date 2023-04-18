@@ -34,6 +34,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
         # endregion
 
         PhotonNetwork.ConnectUsingSettings();
+
+        WordDataList words = WordDataList.Deserialize(Resources.Load<TextAsset>("Words"));
+        Debug.Log($"Loaded {words.Words.Count} words");
     }
 
     public override void OnConnectedToMaster() => PhotonNetwork.JoinRandomRoom();
@@ -45,7 +48,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         if (PhotonNetwork.CurrentRoom.PlayerCount == 2) {
             this.InstantiatePlayer(this.RemotePlayerPrefab);
         }
-        Debug.Log($"Joined room {PhotonNetwork.CurrentRoom.Name}");       
+        Debug.Log($"Joined room {PhotonNetwork.CurrentRoom.Name}");
     }
 
     public override void OnPlayerEnteredRoom(Player remotePlayer) {
