@@ -60,6 +60,7 @@ public class PlayerController : MonoBehaviourPun {
 
     [PunRPC] public void RPCSubmit(string input) {
         if (string.IsNullOrEmpty(input)) return;
+        if (!this.GameManager.WordList.Contains(input)) { Debug.Log($"Not a valid word ({input})"); return; }
         
         this.SubmittedStrings.Add(input);
         this.InputSubmitted?.Invoke(this, input);

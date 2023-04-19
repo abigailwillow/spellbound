@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public List<PlayerController> Players = new List<PlayerController>(2);
     public PlayerController LocalPlayer => Players.Find(player => player.PlayerType == PlayerType.Local);
     public PlayerController RemotePlayer => Players.Find(player => player.PlayerType == PlayerType.Remote);
+    public WordDataList WordList { get; private set; }
 
     # region Events
     /// <summary>
@@ -35,8 +36,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         PhotonNetwork.ConnectUsingSettings();
 
-        WordDataList words = WordDataList.Deserialize(Resources.Load<TextAsset>("Words"));
-        Debug.Log($"Loaded {words.Words.Count} words");
+        WordList = WordDataList.Deserialize(Resources.Load<TextAsset>("Words"));
+        Debug.Log($"Loaded {WordList.Words.Count} words");
+        Debug.Log(string.Join(", ", WordList.Words.ConvertAll(word => word.Word)));
     }
 
     public override void OnConnectedToMaster() => PhotonNetwork.JoinRandomRoom();

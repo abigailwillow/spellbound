@@ -39,10 +39,25 @@ using UnityEngine;
         this.type = type;
         this.category = category.ToLower();
         this.synonyms = synonyms;
-        Synonyms.ForEach(synonym => synonym.ToLower());
+        this.Synonyms.ForEach(synonym => synonym.ToLower());
         this.antonyms = antonyms;
-        Antonyms.ForEach(antonym => antonym.ToLower());
+        this.Antonyms.ForEach(antonym => antonym.ToLower());
         this.relatedWords = relatedWords;
-        RelatedWords.ForEach(relatedWord => relatedWord.ToLower());
+        this.RelatedWords.ForEach(relatedWord => relatedWord.ToLower());
     }
+
+    /// <summary>
+    /// Returns true if the word is a synonym of this word
+    /// </summary>
+    public bool IsSynonym(string word) => this.synonyms.Exists(synonym => synonym == word);
+
+    /// <summary>
+    /// Returns true if the word is an antonym of this word
+    /// </summary>
+    public bool IsAntonym(string word) => this.antonyms.Exists(antonym => antonym == word);
+
+    /// <summary>
+    /// Returns true if the word is related to this word
+    /// </summary>
+    public bool IsRelated(string word) => this.relatedWords.Exists(relatedWord => relatedWord == word);
 }
