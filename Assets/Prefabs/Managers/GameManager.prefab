@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa0b205a30621904f889302ce812a924, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LocalPlayerPrefab: {fileID: 522415428453542352, guid: fbd5ab320f2b36d41b8464a438c2d8a6, type: 3}
-  RemotePlayerPrefab: {fileID: 522415428453542352, guid: 2151659caf1397b45a834c0d3ba3f4ff, type: 3}
+  playerPrefab: {fileID: 522415428453542352, guid: 2151659caf1397b45a834c0d3ba3f4ff, type: 3}
+  localPlayerBinding: {fileID: 11400000, guid: 564540b37e52a464ab97500bd78b2975, type: 2}
 --- !u!114 &718835662578800086
 MonoBehaviour:
   m_ObjectHideFlags: 0

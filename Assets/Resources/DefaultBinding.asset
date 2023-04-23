@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a57371b433dabdc468338d02b20bc8b1, type: 3}
+  m_Name: DefaultBinding
+  m_EditorClassIdentifier: 
+  SubmitAction:
+    m_Name: Submit
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 2abf280a-7631-40b6-b2fe-8c3c03842245
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: d6839f70-9b18-4e71-949b-66f739cc1330
+      m_Path: <Keyboard>/enter
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Submit
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 504e223e-8f28-4596-876a-e0bf2c3f1c18
+      m_Path: <Keyboard>/numpadEnter
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Submit
+      m_Flags: 0
+    m_Flags: 0
+  BackspaceAction:
+    m_Name: Backspace
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 6d282c31-cbe3-4d18-9f7c-1b8760281e19
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 1e8bfc91-5d7c-4dd7-8d8c-a2be98436ba5
+      m_Path: <Keyboard>/backspace
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Backspace
+      m_Flags: 0
+    m_Flags: 0

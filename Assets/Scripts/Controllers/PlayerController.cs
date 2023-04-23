@@ -8,12 +8,13 @@ public class PlayerController : MonoBehaviourPun {
     [SerializeField] private int maxHealth = 100;
     public int MaxHealth => this.maxHealth;
     public int Health { get; private set; }
-    [SerializeField] private PlayerType playerType;
-    public PlayerType PlayerType => this.playerType;
+    public PlayerType PlayerType => this.photonView.IsMine ? PlayerType.Local : PlayerType.Remote;
     public string InputText { get; private set; }
     public List<string> SubmittedStrings { get; private set; } = new List<string>();
-    private PlayerController Opponent => this.PlayerType == PlayerType.Local ? GameManager.RemotePlayer : GameManager.LocalPlayer;
-    private GameManager GameManager => GameManager.Instance;
+    public string LastSubmittedString => this.SubmittedStrings.Count > 0 ? this.SubmittedStrings[this.SubmittedStrings.Count - 1] : string.Empty;
+    private PlayerController opponent => this.PlayerType == PlayerType.Local ? gameManager.RemotePlayer : gameManager.LocalPlayer;
+    private GameManager gameManager => GameManager.Instance;
+    private WordDataList wordList => this.gameManager.WordList;
 
     # region Events
     /// <summary>
@@ -32,7 +33,7 @@ public class PlayerController : MonoBehaviourPun {
 
     private void Awake() {
         this.Health = this.MaxHealth;
-        this.photonView.ViewID = PhotonNetwork.IsMasterClient ^ this.PlayerType == PlayerType.Local ? 2 : 1;
+        this.gameManager.AddPlayer(this);
     }
     
     public void TextInput(string character) => this.photonView.RPC(nameof(RPCTextInput), RpcTarget.All, character);
@@ -60,7 +61,11 @@ public class PlayerController : MonoBehaviourPun {
 
     [PunRPC] public void RPCSubmit(string input) {
         if (string.IsNullOrEmpty(input)) return;
-        if (!this.GameManager.WordList.Contains(input)) { Debug.Log($"Not a valid word ({input})"); return; }
+        if (!this.wordList.Contains(input)) { Debug.Log($"[{this.PlayerType}] Not a valid word ({input})"); return; }
+
+        // if (this.wordList.Get(this.opponent.LastSubmittedString).IsSynonym(input)) Debug.Log($"[{this.PlayerType}] SYNONYM -> {input}");
+        // if (this.wordList.Get(this.opponent.LastSubmittedString).IsAntonym(input)) Debug.Log($"[{this.PlayerType}] ANTONYM -> {input}");
+        // if (this.wordList.Get(this.opponent.LastSubmittedString).IsRelated(input)) Debug.Log($"[{this.PlayerType}] RELATED -> {input}");
         
         this.SubmittedStrings.Add(input);
         this.InputSubmitted?.Invoke(this, input);
@@ -68,7 +73,7 @@ public class PlayerController : MonoBehaviourPun {
         this.InputText = string.Empty;
         this.InputTextUpdated?.Invoke(this, this.InputText);
 
-        this.Opponent.TakeDamage(input.Length);
+        this.opponent.TakeDamage(input.Length);
 
         Debug.Log($"[{this.PlayerType}] Submit -> {input}");
     }
@@ -84,4 +89,6 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     private void Die() => Debug.Log($"[{this.PlayerType}] Died");
+
+    private void OnDestroy() => this.gameManager.PlayerDestroyed?.Invoke(this.PlayerType);
 }

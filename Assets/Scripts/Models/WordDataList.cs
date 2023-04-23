@@ -7,9 +7,9 @@ using UnityEngine;
     public List<WordData> Words => this.words;
     public WordDataList(params WordData[] words) => this.words = new List<WordData>(words);
 
-    public static WordDataList Deserialize(TextAsset json) => JsonUtility.FromJson<WordDataList>(json.text);
-
     public TextAsset Serialize() => new TextAsset(JsonUtility.ToJson(this));
+
+    public static WordDataList Deserialize(TextAsset json) => JsonUtility.FromJson<WordDataList>(json.text);
 
     public WordData Get(string word) => this.words.Find(w => w.Word.ToLower() == word.ToLower());
 

@@ -4,13 +4,13 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 public class UserInterfaceManager : MonoBehaviour {
-    private List<PlayerElements> PlayerElementsList = new List<PlayerElements>(2);
-    private GameManager GameManager => GameManager.Instance;
+    private List<PlayerElements> playerElementsList = new List<PlayerElements>(2);
+    private GameManager gameManager => GameManager.Instance;
 
     private void Awake() {
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
-        this.PlayerElementsList.Add(new PlayerElements(root.Query<VisualElement>("LocalPlayerPanel"), PlayerType.Local));
-        this.PlayerElementsList.Add(new PlayerElements(root.Query<VisualElement>("RemotePlayerPanel"), PlayerType.Remote));
+        this.playerElementsList.Add(new PlayerElements(root.Query<VisualElement>("LocalPlayerPanel"), PlayerType.Local));
+        this.playerElementsList.Add(new PlayerElements(root.Query<VisualElement>("RemotePlayerPanel"), PlayerType.Remote));
 
         this.SetPlayerPanelActive(false, PlayerType.Local);
         this.SetPlayerPanelActive(false, PlayerType.Remote);
@@ -20,7 +20,7 @@ public class UserInterfaceManager : MonoBehaviour {
     }
 
     private void Start() {
-        GameManager.PlayerInstantiated += player => {
+        this.gameManager.PlayerInstantiated += player => {
             this.SetPlayerPanelActive(true, player.PlayerType);
             this.UpdatePlayerHealth(player, player.Health);
             this.UpdatePlayerInput(player, player.InputText);
@@ -33,7 +33,7 @@ public class UserInterfaceManager : MonoBehaviour {
             this.GetPlayerElements(player.PlayerType).Username.text = $"Player {player.photonView.ViewID}";
         };
 
-        GameManager.PlayerDestroyed += playerType => {
+        this.gameManager.PlayerDestroyed += playerType => {
             this.SetPlayerPanelActive(false, playerType);
         };
     }
@@ -66,7 +66,7 @@ public class UserInterfaceManager : MonoBehaviour {
         Enumerable.Reverse(player.SubmittedStrings).Take(5).ToList().ForEach(word => playerElements.InputHistory.text += $"{word}\n");
     }
 
-    private PlayerElements GetPlayerElements(PlayerType playerType) => this.PlayerElementsList.Find(playerElements => playerElements.PlayerType == playerType);
+    private PlayerElements GetPlayerElements(PlayerType playerType) => this.playerElementsList.Find(playerElements => playerElements.PlayerType == playerType);
 
     private class PlayerElements {
         public PlayerElements(VisualElement playerPanel, PlayerType playerType) {

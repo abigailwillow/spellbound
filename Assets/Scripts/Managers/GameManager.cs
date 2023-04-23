@@ -6,12 +6,12 @@ using Photon.Realtime;
 
 public class GameManager : MonoBehaviourPunCallbacks {
     public static GameManager Instance { get; private set; }
-    [SerializeField] private GameObject LocalPlayerPrefab;
-    [SerializeField] private GameObject RemotePlayerPrefab;
-    public List<PlayerController> Players = new List<PlayerController>(2);
+    public List<PlayerController> Players { get; private set; } = new List<PlayerController>(2);
     public PlayerController LocalPlayer => Players.Find(player => player.PlayerType == PlayerType.Local);
     public PlayerController RemotePlayer => Players.Find(player => player.PlayerType == PlayerType.Remote);
     public WordDataList WordList { get; private set; }
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private Binding localPlayerBinding;
 
     # region Events
     /// <summary>
@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
         # endregion
 
+        PhotonNetwork.PrefabPool.Register(this.playerPrefab);
         PhotonNetwork.ConnectUsingSettings();
 
         WordList = WordDataList.Deserialize(Resources.Load<TextAsset>("Words"));
@@ -45,22 +46,14 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     public override void OnConnected() => Debug.Log($"Connected to {PhotonNetwork.Server}");
 
+    public override void OnPlayerEnteredRoom(Player remotePlayer) => Debug.Log($"Remote player joined the room");
+
+    // TODO: Destroy room on player disconnect
+    public override void OnPlayerLeftRoom(Player remotePlayer) => Debug.Log($"Remote player left the room");
+
     public override void OnJoinedRoom() {
-        this.InstantiatePlayer(this.LocalPlayerPrefab);
-        if (PhotonNetwork.CurrentRoom.PlayerCount == 2) {
-            this.InstantiatePlayer(this.RemotePlayerPrefab);
-        }
+        PhotonNetwork.Instantiate(this.playerPrefab.name, this.playerPrefab.transform.position, this.playerPrefab.transform.rotation).GetComponent<PlayerController>().gameObject.AddComponent<InputController>().Binding = this.localPlayerBinding;
         Debug.Log($"Joined room {PhotonNetwork.CurrentRoom.Name}");
-    }
-
-    public override void OnPlayerEnteredRoom(Player remotePlayer) {
-        this.InstantiatePlayer(this.RemotePlayerPrefab);
-        Debug.Log($"Remote player joined the room");
-    }
-
-    public override void OnPlayerLeftRoom(Player remotePlayer) {
-        this.DestroyPlayer(this.RemotePlayer);
-        Debug.Log($"Remote player left the room");
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message) {
@@ -68,29 +61,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 2 });
     }
 
-    /// <summary>
-    /// Instantiates a player and adds it to the list of players
-    /// </summary>
-    /// <param name="prefab">The prefab to instantiate, must correspond to either the LocalPlayerPrefab or RemotePlayerPrefab</param>
-    private void InstantiatePlayer(GameObject prefab) {
-        if (prefab != this.LocalPlayerPrefab && prefab != this.RemotePlayerPrefab) {
-            Debug.LogError($"Prefab {prefab.name} is not a valid player prefab", this);
-            return;
+    public bool AddPlayer(PlayerController player) {
+        bool valid = this.Players.Count < 2;
+        if (valid) {
+            this.Players.Add(player);
+            this.PlayerInstantiated?.Invoke(player);
         }
-
-        PlayerController player = Instantiate(prefab).GetComponent<PlayerController>();
-        this.Players.Add(player);
-        this.PlayerInstantiated?.Invoke(player);
-    }
-
-    /// <summary>
-    /// Destroys a player and removes it from the list of players
-    /// </summary>
-    /// <param name="player">The player to be destroyed</param>
-    private void DestroyPlayer(PlayerController player) {
-        PlayerType playerType = player.PlayerType;
-        this.Players.Remove(player);
-        Destroy(player.gameObject);
-        this.PlayerDestroyed?.Invoke(player.PlayerType);
+        return valid;
     }
 }
