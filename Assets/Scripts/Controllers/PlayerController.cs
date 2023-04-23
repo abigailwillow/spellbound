@@ -62,12 +62,13 @@ public class PlayerController : MonoBehaviourPun {
     [PunRPC] public void RPCSubmit(string input) {
         if (string.IsNullOrEmpty(input)) return;
         if (!this.wordList.Contains(input)) { Debug.Log($"[{this.PlayerType}] Not a valid word ({input})"); return; }
+        WordData word = this.wordList.Get(input);
 
         if (this.wordList.Contains(this.opponent.LastSubmittedString)) {
-            WordData word = this.wordList.Get(this.opponent.LastSubmittedString);
-            if (word.IsSynonym(input)) Debug.Log($"[{this.PlayerType}] SYNONYM -> {input}");
-            if (word.IsAntonym(input)) Debug.Log($"[{this.PlayerType}] ANTONYM -> {input}");
-            if (word.IsRelated(input)) Debug.Log($"[{this.PlayerType}] RELATED -> {input}");
+            WordData opponentWord = this.wordList.Get(this.opponent.LastSubmittedString);
+            if (opponentWord.IsSynonym(input)) Debug.Log($"[{this.PlayerType}] SYNONYM -> {input}");
+            if (opponentWord.IsAntonym(input)) Debug.Log($"[{this.PlayerType}] ANTONYM -> {input}");
+            if (opponentWord.IsRelated(input)) Debug.Log($"[{this.PlayerType}] RELATED -> {input}");
         }
         
         this.SubmittedStrings.Add(input);
@@ -78,7 +79,7 @@ public class PlayerController : MonoBehaviourPun {
 
         this.opponent.TakeDamage(input.Length);
 
-        Debug.Log($"[{this.PlayerType}] Submit -> {input}");
+        Debug.Log($"[{this.PlayerType}] Submit -> {input} (Synonyms: {string.Join(", ", word.Synonyms)} - Antonyms: {string.Join(", ", word.Antonyms)} - Related: {string.Join(", ", word.RelatedWords)})");
     }
 
     public void TakeDamage(int damage) {
