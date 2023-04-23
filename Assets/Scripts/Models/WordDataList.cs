@@ -13,7 +13,5 @@ using UnityEngine;
 
     public WordData Get(string word) => this.words.Find(w => w.Word.ToLower() == word.ToLower());
 
-    public WordData GetRandom() => this.words[UnityEngine.Random.Range(0, this.words.Count)]; 
-
     public bool Contains(string word) => this.words.Exists(w => w.Word.ToLower() == word.ToLower());
 }

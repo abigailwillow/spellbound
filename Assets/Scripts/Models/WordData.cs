@@ -6,7 +6,7 @@ using UnityEngine;
     /// <summary>
     /// The word itself
     /// </summary>
-    public string Word => word;
+    public string Word => word.ToLower();
     [SerializeField] private string word;
     /// <summary>
     /// The type of word (noun, verb, adjective, etc.)
@@ -49,15 +49,15 @@ using UnityEngine;
     /// <summary>
     /// Returns true if the word is a synonym of this word
     /// </summary>
-    public bool IsSynonym(string word) => this.synonyms.Exists(synonym => synonym == word);
+    public bool IsSynonym(string word) => this.synonyms.Exists(synonym => synonym.ToLower() == word.ToLower());
 
     /// <summary>
     /// Returns true if the word is an antonym of this word
     /// </summary>
-    public bool IsAntonym(string word) => this.antonyms.Exists(antonym => antonym == word);
+    public bool IsAntonym(string word) => this.antonyms.Exists(antonym => antonym.ToLower() == word.ToLower());
 
     /// <summary>
     /// Returns true if the word is related to this word
     /// </summary>
-    public bool IsRelated(string word) => this.relatedWords.Exists(relatedWord => relatedWord == word);
+    public bool IsRelated(string word) => this.relatedWords.Exists(relatedWord => relatedWord.ToLower() == word.ToLower());
 }

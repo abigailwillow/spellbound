@@ -63,9 +63,12 @@ public class PlayerController : MonoBehaviourPun {
         if (string.IsNullOrEmpty(input)) return;
         if (!this.wordList.Contains(input)) { Debug.Log($"[{this.PlayerType}] Not a valid word ({input})"); return; }
 
-        // if (this.wordList.Get(this.opponent.LastSubmittedString).IsSynonym(input)) Debug.Log($"[{this.PlayerType}] SYNONYM -> {input}");
-        // if (this.wordList.Get(this.opponent.LastSubmittedString).IsAntonym(input)) Debug.Log($"[{this.PlayerType}] ANTONYM -> {input}");
-        // if (this.wordList.Get(this.opponent.LastSubmittedString).IsRelated(input)) Debug.Log($"[{this.PlayerType}] RELATED -> {input}");
+        if (this.wordList.Contains(this.opponent.LastSubmittedString)) {
+            WordData word = this.wordList.Get(this.opponent.LastSubmittedString);
+            if (word.IsSynonym(input)) Debug.Log($"[{this.PlayerType}] SYNONYM -> {input}");
+            if (word.IsAntonym(input)) Debug.Log($"[{this.PlayerType}] ANTONYM -> {input}");
+            if (word.IsRelated(input)) Debug.Log($"[{this.PlayerType}] RELATED -> {input}");
+        }
         
         this.SubmittedStrings.Add(input);
         this.InputSubmitted?.Invoke(this, input);
