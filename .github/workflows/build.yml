@@ -45,7 +45,6 @@ jobs:
           buildName: ${{ env.projectName }}
           versioning: Custom
           version: ${{ steps.version.outputs.version_tag }}
-          customParameters: -Development
           
       - name: Create Artifact for GitHub Pages
         id: artifact

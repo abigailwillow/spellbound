@@ -81,15 +81,20 @@ public class GameManager : MonoBehaviourPunCallbacks {
             player.EndTurn();
 
             if (this.Players.Count == MAX_PLAYERS) this.Players[0].StartTurn();
+
+            Debug.Log($"Player {player.photonView.ViewID} joined the game");
         }
         return valid;
     }
 
     public void NextTurn() {
-        this.Players[this.turnCount % this.MAX_PLAYERS].EndTurn();
         this.turnCount++;
-        this.Players[this.turnCount % this.MAX_PLAYERS].StartTurn();
-        Debug.Log($"End of turn {this.turnCount - 1}, starting turn {this.turnCount}");
+        PlayerController lastPlayer = this.Players[(this.turnCount - 1) % this.MAX_PLAYERS];
+        PlayerController currentPlayer = this.Players[this.turnCount % this.MAX_PLAYERS];
+        lastPlayer.EndTurn();
+        currentPlayer.StartTurn();
+
+        Debug.Log($"End of turn {this.turnCount - 1}, starting turn {this.turnCount} (Player {currentPlayer.photonView.ViewID})");
     }
 
     public void NextTurn(PlayerController _, string __) => this.NextTurn();
