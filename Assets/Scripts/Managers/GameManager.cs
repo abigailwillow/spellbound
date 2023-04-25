@@ -10,8 +10,10 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public PlayerController LocalPlayer => Players.Find(player => player.PlayerType == PlayerType.Local);
     public PlayerController RemotePlayer => Players.Find(player => player.PlayerType == PlayerType.Remote);
     public WordDataList WordList { get; private set; }
+    public readonly int MAX_PLAYERS = 2;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Binding localPlayerBinding;
+    private int turnCount = 0;
 
     # region Events
     /// <summary>
@@ -62,11 +64,20 @@ public class GameManager : MonoBehaviourPunCallbacks {
     }
 
     public bool AddPlayer(PlayerController player) {
-        bool valid = this.Players.Count < 2;
+        bool valid = this.Players.Count < this.MAX_PLAYERS;
         if (valid) {
             this.Players.Add(player);
             this.PlayerInstantiated?.Invoke(player);
+            player.InputSubmitted += this.NextTurn;
+            if (!PhotonNetwork.IsMasterClient && this.Players.Count == MAX_PLAYERS) this.NextTurn(player, string.Empty);
         }
         return valid;
+    }
+
+    public void NextTurn(PlayerController player, string _) {
+        this.turnCount++;
+        player.EndTurn();
+        this.Players.Find(otherPlayer => otherPlayer != player).StartTurn();
+        Debug.Log($"End of turn {this.turnCount - 1}, starting turn {this.turnCount}");
     }
 }

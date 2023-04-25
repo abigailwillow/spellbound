@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviourPun {
     private PlayerController opponent => this.PlayerType == PlayerType.Local ? gameManager.RemotePlayer : gameManager.LocalPlayer;
     private GameManager gameManager => GameManager.Instance;
     private WordDataList wordList => this.gameManager.WordList;
+    private InputController input;
 
     # region Events
     /// <summary>
@@ -35,6 +36,8 @@ public class PlayerController : MonoBehaviourPun {
         this.Health = this.MaxHealth;
         this.gameManager.AddPlayer(this);
     }
+
+    private void Start() => this.TryGetComponent<InputController>(out input);
     
     public void TextInput(string character) => this.photonView.RPC(nameof(RPCTextInput), RpcTarget.All, character);
 
@@ -95,4 +98,14 @@ public class PlayerController : MonoBehaviourPun {
     private void Die() => Debug.Log($"[{this.PlayerType}] Died");
 
     private void OnDestroy() => this.gameManager.PlayerDestroyed?.Invoke(this.PlayerType);
+
+    public void StartTurn() {
+        if (this.input) this.input.enabled = true;
+        Debug.Log($"[{this.PlayerType}] Turn Started");
+    }
+
+    public void EndTurn() {
+        if (this.input) this.input.enabled = false;
+        Debug.Log($"[{this.PlayerType}] Turn Ended");
+    }
 }

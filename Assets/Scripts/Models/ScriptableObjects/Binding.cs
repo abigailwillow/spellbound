@@ -6,12 +6,12 @@ public class Binding : ScriptableObject {
     public InputAction SubmitAction;
     public InputAction BackspaceAction;
 
-    private void OnEnable() {
+    public void OnEnable() {
         this.SubmitAction.Enable();
         this.BackspaceAction.Enable();
     }
 
-    private void OnDisable() {
+    public void OnDisable() {
         this.SubmitAction.Disable();
         this.BackspaceAction.Disable();
     }

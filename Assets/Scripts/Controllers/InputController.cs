@@ -16,9 +16,15 @@ public class InputController : MonoBehaviour {
 
     private void Start() => this.playerController = this.GetComponent<PlayerController>();
 
-    private void OnEnable() => Keyboard.current.onTextInput += OnTextInput;
+    private void OnEnable() {
+        Keyboard.current.onTextInput += OnTextInput;
+        this.Binding.OnEnable();
+    }
 
-    private void OnDisable() => Keyboard.current.onTextInput -= OnTextInput;
+    private void OnDisable() {
+        Keyboard.current.onTextInput -= OnTextInput;
+        this.Binding.OnDisable();
+    }
 
     public void OnTextInput(char character) {
         if (char.IsLetter(character)) {

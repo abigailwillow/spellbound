@@ -5,7 +5,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   build:
-    name: Build and Publish Project
+    name: Build and Publish
     runs-on: ubuntu-latest
     environment: production
     permissions: write-all
@@ -33,7 +33,7 @@ jobs:
           tag_prefix: ''
           version_format: "${major}.${minor}.${increment}"
       
-      - name: Build Project
+      - name: Build Unity Project
         id: build
         uses: game-ci/unity-builder@v2.1.0
         env:
