@@ -14,6 +14,8 @@ public class InputController : MonoBehaviour {
     }
     private PlayerController playerController;
 
+    private void Awake() => TouchScreenKeyboard.Open("");
+
     private void Start() => this.playerController = this.GetComponent<PlayerController>();
 
     private void OnEnable() {
