@@ -16,7 +16,7 @@ public class UserInterfaceManager : MonoBehaviour {
         this.SetPlayerPanelActive(false, PlayerType.Remote);
 
         Label version = root.Query<Label>("VersionLabel");
-        version.text += $"{Application.version}";
+        version.text += Application.isEditor ? "in Development" : $"{Application.version}";
     }
 
     private void Start() {
