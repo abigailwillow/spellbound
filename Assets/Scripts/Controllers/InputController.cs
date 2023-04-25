@@ -18,12 +18,12 @@ public class InputController : MonoBehaviour {
 
     private void OnEnable() {
         Keyboard.current.onTextInput += OnTextInput;
-        this.Binding.OnEnable();
+        this.Binding?.OnEnable();
     }
 
     private void OnDisable() {
         Keyboard.current.onTextInput -= OnTextInput;
-        this.Binding.OnDisable();
+        this.Binding?.OnDisable();
     }
 
     public void OnTextInput(char character) {
