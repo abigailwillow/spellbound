@@ -44,6 +44,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
         Debug.Log(string.Join(", ", WordList.Words.ConvertAll(word => word.Word)));
     }
 
+    private void Update() {
+        float cameraHalfWidth = (Camera.main.orthographicSize * Camera.main.aspect) / 2;
+        this.Players.ForEach(player => {
+            player.transform.position = new Vector3(cameraHalfWidth * (player.PlayerType == PlayerType.Local ? -1 : 1), 0, 0);
+        });
+    }
+
     public override void OnConnectedToMaster() => PhotonNetwork.JoinRandomRoom();
 
     public override void OnConnected() => Debug.Log($"Connected to {PhotonNetwork.Server}");
