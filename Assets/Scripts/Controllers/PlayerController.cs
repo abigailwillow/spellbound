@@ -34,10 +34,12 @@ public class PlayerController : MonoBehaviourPun {
 
     private void Awake() {
         this.Health = this.MaxHealth;
-        this.gameManager.AddPlayer(this);
     }
 
-    private void Start() => this.TryGetComponent<InputController>(out input);
+    private void Start() {
+        this.TryGetComponent<InputController>(out input);
+        this.gameManager.AddPlayer(this);
+    }
     
     public void TextInput(string character) => this.photonView.RPC(nameof(RPCTextInput), RpcTarget.All, character);
 

@@ -47,6 +47,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private void Update() {
         float cameraHalfWidth = (Camera.main.orthographicSize * Camera.main.aspect) / 2;
         this.Players.ForEach(player => {
+            if (!player) return;
             player.transform.position = new Vector3(cameraHalfWidth * (player.PlayerType == PlayerType.Local ? -1 : 1), 0, 0);
         });
     }
@@ -67,7 +68,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     public override void OnJoinRandomFailed(short returnCode, string message) {
         Debug.Log($"Could not join a random room ({message}), creating a new room");
-        PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 2 });
+        PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = (byte) this.MAX_PLAYERS });
     }
 
     public bool AddPlayer(PlayerController player) {
@@ -77,7 +78,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
             this.Players.Sort((a, b) => a.photonView.ViewID - b.photonView.ViewID);
             this.PlayerInstantiated?.Invoke(player);
             player.InputSubmitted += this.NextTurn;
-            if (this.Players.Count == MAX_PLAYERS) this.NextTurn();
+            player.EndTurn();
+
+            if (this.Players.Count == MAX_PLAYERS) this.Players[0].StartTurn();
         }
         return valid;
     }
