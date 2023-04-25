@@ -74,17 +74,20 @@ public class GameManager : MonoBehaviourPunCallbacks {
         bool valid = this.Players.Count < this.MAX_PLAYERS;
         if (valid) {
             this.Players.Add(player);
+            this.Players.Sort((a, b) => a.photonView.ViewID - b.photonView.ViewID);
             this.PlayerInstantiated?.Invoke(player);
             player.InputSubmitted += this.NextTurn;
-            if (!PhotonNetwork.IsMasterClient && this.Players.Count == MAX_PLAYERS) this.NextTurn(player, string.Empty);
+            if (this.Players.Count == MAX_PLAYERS) this.NextTurn();
         }
         return valid;
     }
 
-    public void NextTurn(PlayerController player, string _) {
+    public void NextTurn() {
+        this.Players[this.turnCount % this.MAX_PLAYERS].EndTurn();
         this.turnCount++;
-        player.EndTurn();
-        this.Players.Find(otherPlayer => otherPlayer != player).StartTurn();
+        this.Players[this.turnCount % this.MAX_PLAYERS].StartTurn();
         Debug.Log($"End of turn {this.turnCount - 1}, starting turn {this.turnCount}");
     }
+
+    public void NextTurn(PlayerController _, string __) => this.NextTurn();
 }
