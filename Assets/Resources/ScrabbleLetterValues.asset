@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b90478aa86c8fbe42ac2b323042908e3, type: 3}
+  m_Name: ScrabbleLetterValues
+  m_EditorClassIdentifier: 
+  Letters:
+  - Letter: 97
+    Value: 1
+  - Letter: 98
+    Value: 3
+  - Letter: 99
+    Value: 3
+  - Letter: 100
+    Value: 2
+  - Letter: 101
+    Value: 1
+  - Letter: 102
+    Value: 4
+  - Letter: 103
+    Value: 2
+  - Letter: 104
+    Value: 4
+  - Letter: 105
+    Value: 1
+  - Letter: 106
+    Value: 8
+  - Letter: 107
+    Value: 5
+  - Letter: 108
+    Value: 1
+  - Letter: 109
+    Value: 3
+  - Letter: 110
+    Value: 1
+  - Letter: 111
+    Value: 1
+  - Letter: 112
+    Value: 3
+  - Letter: 113
+    Value: 10
+  - Letter: 114
+    Value: 1
+  - Letter: 115
+    Value: 1
+  - Letter: 116
+    Value: 1
+  - Letter: 117
+    Value: 1
+  - Letter: 118
+    Value: 4
+  - Letter: 119
+    Value: 4
+  - Letter: 120
+    Value: 8
+  - Letter: 121
+    Value: 4
+  - Letter: 122
+    Value: 10
