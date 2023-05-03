@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public readonly int MAX_PLAYERS = 2;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Binding localPlayerBinding;
+    [SerializeField] private LetterValues letterValues;
     private int turnCount = 0;
 
     # region Events
@@ -41,7 +42,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         WordList = WordDataList.Deserialize(Resources.Load<TextAsset>("Words"));
         Debug.Log($"Loaded {WordList.Words.Count} words");
-        Debug.Log(string.Join(", ", WordList.Words.ConvertAll(word => word.Word)));
+        Debug.Log($"Valid Words: {string.Join(", ", WordList.Words.ConvertAll(word => word.Word))}");
+
+        List<string> debugValues = new List<string>();
+        foreach (char letter in "abcdefghijklmnopqrstuvwxyz") debugValues.Add($"{letter}: {this.letterValues.GetValue(letter)}");
+        Debug.Log($"Letter Values: {string.Join(", ", debugValues)}");
     }
 
     private void Update() {
@@ -68,7 +73,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     public override void OnJoinRandomFailed(short returnCode, string message) {
         Debug.Log($"Could not join a random room ({message}), creating a new room");
-        PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = (byte) this.MAX_PLAYERS });
+        PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = (byte)this.MAX_PLAYERS });
     }
 
     public bool AddPlayer(PlayerController player) {
@@ -87,6 +92,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
         return valid;
     }
 
+    public void NextTurn(PlayerController _, string __) => this.NextTurn();
+
     public void NextTurn() {
         this.turnCount++;
         PlayerController lastPlayer = this.Players[(this.turnCount - 1) % this.MAX_PLAYERS];
@@ -97,5 +104,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
         Debug.Log($"End of turn {this.turnCount - 1}, starting turn {this.turnCount} (Player {currentPlayer.photonView.ViewID})");
     }
 
-    public void NextTurn(PlayerController _, string __) => this.NextTurn();
+    public int CalculateDamage(string word) {
+        int damage = 0;
+        foreach (char letter in word.ToLower()) damage += this.letterValues.GetValue(letter);
+        return damage;
+    }
 }

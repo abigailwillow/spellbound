@@ -82,7 +82,7 @@ public class PlayerController : MonoBehaviourPun {
         this.InputText = string.Empty;
         this.InputTextUpdated?.Invoke(this, this.InputText);
 
-        this.opponent.TakeDamage(input.Length);
+        this.opponent.TakeDamage(this.gameManager.CalculateDamage(input));
 
         Debug.Log($"[{this.PlayerType}] Submit -> {input} (Synonyms: {string.Join(", ", word.Synonyms)} - Antonyms: {string.Join(", ", word.Antonyms)} - Related: {string.Join(", ", word.RelatedWords)})");
     }
