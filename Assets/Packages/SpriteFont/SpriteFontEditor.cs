@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
@@ -547,3 +549,5 @@ public class SpriteFontAssetEditor : Editor {
         }
     }
 }
+
+#endif

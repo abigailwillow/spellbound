@@ -1,3 +1,5 @@
+#if UNITY_EDITOR
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -18,3 +20,5 @@ internal static class SpriteFontAsset_CreationMenu {
         spriteFontAsset.faceInfo = FontEngine.GetFaceInfo();
     }
 }
+
+#endif

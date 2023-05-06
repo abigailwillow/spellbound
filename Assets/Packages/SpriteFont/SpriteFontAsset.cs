@@ -8,13 +8,13 @@ using UnityEngine.TextCore;
 using UnityEngine.TextCore.Text;
 
 public class SpriteFontAsset : FontAsset {
+    #if UNITY_EDITOR
     [SerializeField]
     float m_SpriteSpacing = 0;
 
     [SerializeField]
     Texture2D m_SpriteSheet;
 
-    #if UNITY_EDITOR
 
     private void Awake() => Init();
     private void OnValidate() => Init();
@@ -165,5 +165,5 @@ public class SpriteFontAsset : FontAsset {
         EditorUtility.SetDirty(this);
     }
 
-#endif
+    #endif
 }
