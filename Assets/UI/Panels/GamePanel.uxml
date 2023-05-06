@@ -17,7 +17,7 @@
                 <ui:Label text="100/100" display-tooltip-when-elided="true" name="HealthText" class="health-text" style="flex-grow: 1; -unity-text-align: middle-center; font-size: 48px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; color: rgb(255, 255, 255);" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label display-tooltip-when-elided="true" name="InputText" class="input-text" style="font-size: 48px; -unity-text-align: middle-center; -unity-font-style: normal; color: rgb(255, 255, 255); padding-left: 0; padding-right: 0; margin-left: 0; margin-right: 0; flex-wrap: nowrap; white-space: nowrap; margin-top: 32px; margin-bottom: 32px;" />
+        <ui:Label display-tooltip-when-elided="true" name="InputText" class="input-text" />
         <ui:Label display-tooltip-when-elided="true" name="InputHistory" class="history-label" style="padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px; -unity-text-align: lower-center;" />
     </ui:VisualElement>
     <ui:Label text="Version " display-tooltip-when-elided="true" name="VersionLabel" />
