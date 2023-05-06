@@ -3,7 +3,7 @@
 }
 
 .unity-text-element {
-    color: rgba(255, 255, 255, 255);
+    color: rgb(255, 255, 255);
 }
 
 .player-panel {
@@ -54,7 +54,7 @@
 }
 
 .input-text {
-    font-size: 48px;
+    font-size: 96px;
     -unity-text-align: middle-center;
     margin-left: 0;
     margin-right: 0;
@@ -62,12 +62,14 @@
     white-space: nowrap;
     margin-top: 32px;
     margin-bottom: 32px;
+    -unity-font-definition: url('project://database/Assets/Sprites/Tiles.asset?fileID=11400000&guid=cc321aea6ce130a4cb2673fe809027a2&type=2#Tiles');
 }
 
 .history-label {
     flex-grow: 1;
-    font-size: 32px;
+    font-size: 48px;
     -unity-text-align: upper-center;
+    -unity-font-definition: url('project://database/Assets/Sprites/Tiles.asset?fileID=11400000&guid=cc321aea6ce130a4cb2673fe809027a2&type=2#Tiles');
 }
 
 #VersionLabel {
