@@ -5,12 +5,18 @@ using UnityEngine.UIElements;
 
 public class UserInterfaceManager : MonoBehaviour {
     private List<PlayerElements> playerElementsList = new List<PlayerElements>(2);
+    private VisualElement instructionPanel;
+    private Label instructionLabel;
     private GameManager gameManager => GameManager.Instance;
 
     private void Awake() {
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
         this.playerElementsList.Add(new PlayerElements(root.Query<VisualElement>("LocalPlayerPanel"), PlayerType.Local));
         this.playerElementsList.Add(new PlayerElements(root.Query<VisualElement>("RemotePlayerPanel"), PlayerType.Remote));
+
+        this.instructionPanel = root.Query<VisualElement>("InstructionPanel");
+        this.instructionLabel = this.instructionPanel.Query<Label>("InstructionLabel");
+        this.instructionLabel.text = "Waiting for other player...";
 
         this.SetPlayerPanelActive(false, PlayerType.Local);
         this.SetPlayerPanelActive(false, PlayerType.Remote);
@@ -45,17 +51,18 @@ public class UserInterfaceManager : MonoBehaviour {
     /// <param name="playerType">Which player's panel to enable or disable</param>
     public void SetPlayerPanelActive(bool enabled, PlayerType playerType) {
         PlayerElements playerElements = this.GetPlayerElements(playerType);
-        playerElements.Panel.style.visibility = enabled ? Visibility.Visible : Visibility.Hidden;
+        playerElements.Panel.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
+        this.instructionPanel.style.display = (enabled && playerType == PlayerType.Remote) ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
     private void UpdatePlayerHealth(PlayerController player, int health) {
         PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
-        playerElements.HealthFill.style.width = new StyleLength(Length.Percent((float) health / player.MaxHealth * 100));
+        playerElements.HealthFill.style.width = new StyleLength(Length.Percent((float)health / player.MaxHealth * 100));
         playerElements.HealthText.text = $"{health}/{player.MaxHealth}";
     }
 
     private void UpdatePlayerInput(PlayerController player, string text) {
-                PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
+        PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
 
         playerElements.InputText.text = text;
     }

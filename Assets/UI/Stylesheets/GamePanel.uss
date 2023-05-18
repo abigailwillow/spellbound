@@ -7,12 +7,12 @@
 }
 
 .player-panel {
-    flex-grow: 1;
     width: 50%;
     padding-left: 64px;
     padding-right: 64px;
     padding-top: 32px;
     padding-bottom: 32px;
+    display: none;
 }
 
 .health-bar {
@@ -78,4 +78,22 @@
     bottom: 8px;
     font-size: 16px;
     color: rgb(255, 255, 255);
+}
+
+#InstructionPanel {
+    width: 50%;
+    padding-left: 64px;
+    padding-right: 64px;
+    padding-top: 32px;
+    padding-bottom: 32px;
+    align-items: stretch;
+    justify-content: center;
+}
+
+#InstructionLabel {
+    -unity-font: url('project://database/Assets/Fonts/DotGothic16-Regular.ttf?fileID=12800000&guid=f168a3f0b1e417c44b4fedcd1c1858ad&type=3#DotGothic16-Regular');
+    -unity-font-definition: initial;
+    font-size: 64px;
+    -unity-text-align: middle-center;
+    white-space: normal;
 }

@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/Stylesheets/GamePanel.uss?fileID=7433441132597879392&amp;guid=f90568ac2939650419af923c190f5f6f&amp;type=3#GamePanel" />
-    <ui:VisualElement name="LocalPlayerPanel" class="player-panel" style="display: flex;">
+    <ui:VisualElement name="LocalPlayerPanel" class="player-panel">
         <ui:Label display-tooltip-when-elided="true" name="Username" text="Player" class="username-label" />
         <ui:VisualElement name="HealthBar" class="health-bar" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; height: 96px; background-image: url(&apos;project://database/Assets/Sprites/HealthBarBackground.png?fileID=21300000&amp;guid=0b35d8d6522312c42a82b4d4fb79fa45&amp;type=3#HealthBarBackground&apos;); display: flex;">
             <ui:VisualElement name="HealthFill" class="health-bar-fill" style="display: flex;">
@@ -10,7 +10,7 @@
         <ui:Label display-tooltip-when-elided="true" name="InputText" class="input-text" />
         <ui:Label display-tooltip-when-elided="true" name="InputHistory" class="history-label" style="padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px; -unity-text-align: lower-center;" />
     </ui:VisualElement>
-    <ui:VisualElement name="RemotePlayerPanel" class="player-panel" style="flex-grow: 0; width: 50%; padding-left: 64px; padding-right: 64px; padding-top: 32px; padding-bottom: 32px; display: flex; visibility: visible;">
+    <ui:VisualElement name="RemotePlayerPanel" class="player-panel" style="width: 50%; padding-left: 64px; padding-right: 64px; padding-top: 32px; padding-bottom: 32px;">
         <ui:Label display-tooltip-when-elided="true" name="Username" text="Player" class="username-label" />
         <ui:VisualElement name="HealthBar" class="health-bar">
             <ui:VisualElement name="HealthFill" class="health-bar-fill" style="background-image: url(&apos;project://database/Assets/Sprites/HealthBarForeground.png?fileID=21300000&amp;guid=4d9da6976204af641bebf9740459f68f&amp;type=3#HealthBarForeground&apos;); height: auto; flex-grow: 1; -unity-slice-right: 0; transition-timing-function: ease-in-out;">
@@ -19,6 +19,9 @@
         </ui:VisualElement>
         <ui:Label display-tooltip-when-elided="true" name="InputText" class="input-text" />
         <ui:Label display-tooltip-when-elided="true" name="InputHistory" class="history-label" style="padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px; -unity-text-align: lower-center;" />
+    </ui:VisualElement>
+    <ui:VisualElement name="InstructionPanel">
+        <ui:Label display-tooltip-when-elided="true" name="InstructionLabel" />
     </ui:VisualElement>
     <ui:Label text="Version " display-tooltip-when-elided="true" name="VersionLabel" />
 </ui:UXML>
