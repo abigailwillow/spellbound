@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,6 +9,7 @@ public class UserInterfaceManager : MonoBehaviour {
     private VisualElement instructionPanel;
     private Label instructionLabel;
     private GameManager gameManager => GameManager.Instance;
+    [SerializeField, Range(0f, 1f)] private float INSTRUCTION_ANIMATION_DELAY = 0.05f;
 
     private void Awake() {
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
@@ -54,9 +56,21 @@ public class UserInterfaceManager : MonoBehaviour {
         this.instructionPanel.style.display = (enabled && playerType == PlayerType.Remote) ? DisplayStyle.None : DisplayStyle.Flex;
 
         if (playerType == PlayerType.Local && enabled) {
-            this.instructionLabel.text = "Waiting for other player...";
+            this.SetInstructionText("Waiting for opponent...");
         }
     }
+
+    public void SetInstructionText(string text) {
+        this.instructionLabel.text = string.Empty;
+        StartCoroutine(AnimateInstructionText(text));
+    }
+
+    private IEnumerator AnimateInstructionText(string text, int position = 0) {
+        this.instructionLabel.text = text.Substring(0, ++position);
+        yield return new WaitForSeconds(INSTRUCTION_ANIMATION_DELAY);
+        if (position < text.Length) StartCoroutine(AnimateInstructionText(text, position));
+    }
+
 
     private void UpdatePlayerHealth(PlayerController player, int health) {
         PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
