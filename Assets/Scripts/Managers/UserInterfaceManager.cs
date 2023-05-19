@@ -16,7 +16,6 @@ public class UserInterfaceManager : MonoBehaviour {
 
         this.instructionPanel = root.Query<VisualElement>("InstructionPanel");
         this.instructionLabel = this.instructionPanel.Query<Label>("InstructionLabel");
-        this.instructionLabel.text = "Waiting for other player...";
 
         this.SetPlayerPanelActive(false, PlayerType.Local);
         this.SetPlayerPanelActive(false, PlayerType.Remote);
@@ -53,6 +52,10 @@ public class UserInterfaceManager : MonoBehaviour {
         PlayerElements playerElements = this.GetPlayerElements(playerType);
         playerElements.Panel.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
         this.instructionPanel.style.display = (enabled && playerType == PlayerType.Remote) ? DisplayStyle.None : DisplayStyle.Flex;
+
+        if (playerType == PlayerType.Local && enabled) {
+            this.instructionLabel.text = "Waiting for other player...";
+        }
     }
 
     private void UpdatePlayerHealth(PlayerController player, int health) {
