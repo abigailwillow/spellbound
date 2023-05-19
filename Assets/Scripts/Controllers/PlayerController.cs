@@ -30,6 +30,7 @@ public class PlayerController : MonoBehaviourPun {
     /// Called when the player submits a word
     /// </summary>
     public Action<PlayerController, string> InputSubmitted;
+    public Action<PlayerController, string> NameUpdated; 
     # endregion
 
     private void Awake() {
@@ -39,6 +40,7 @@ public class PlayerController : MonoBehaviourPun {
     private void Start() {
         this.TryGetComponent<InputController>(out input);
         this.gameManager.AddPlayer(this);
+        this.gameManager.GameStateChanged += this.GameStateChanged;
     }
     
     public void TextInput(string character) => this.photonView.RPC(nameof(RPCTextInput), RpcTarget.All, character);
@@ -66,25 +68,31 @@ public class PlayerController : MonoBehaviourPun {
 
     [PunRPC] public void RPCSubmit(string input) {
         if (string.IsNullOrEmpty(input)) return;
-        if (!this.wordList.Contains(input)) { Debug.Log($"[{this.PlayerType}] Not a valid word ({input})"); return; }
-        WordData word = this.wordList.Get(input);
+        if (this.gameManager.GameState == GameState.Playing) {
+            if (!this.wordList.Contains(input)) { Debug.Log($"[{this.PlayerType}] Not a valid word ({input})"); return; }
+            WordData word = this.wordList.Get(input);
 
-        if (this.wordList.Contains(this.opponent.LastSubmittedString)) {
-            WordData opponentWord = this.wordList.Get(this.opponent.LastSubmittedString);
-            if (opponentWord.IsSynonym(input)) Debug.Log($"[{this.PlayerType}] SYNONYM -> {input}");
-            if (opponentWord.IsAntonym(input)) Debug.Log($"[{this.PlayerType}] ANTONYM -> {input}");
-            if (opponentWord.IsRelated(input)) Debug.Log($"[{this.PlayerType}] RELATED -> {input}");
+            if (this.wordList.Contains(this.opponent.LastSubmittedString)) {
+                WordData opponentWord = this.wordList.Get(this.opponent.LastSubmittedString);
+                if (opponentWord.IsSynonym(input)) Debug.Log($"[{this.PlayerType}] SYNONYM -> {input}");
+                if (opponentWord.IsAntonym(input)) Debug.Log($"[{this.PlayerType}] ANTONYM -> {input}");
+                if (opponentWord.IsRelated(input)) Debug.Log($"[{this.PlayerType}] RELATED -> {input}");
+            }
+            
+            this.SubmittedStrings.Add(input);
+            this.InputSubmitted?.Invoke(this, input);
+
+            this.InputText = string.Empty;
+            this.InputTextUpdated?.Invoke(this, this.InputText);
+
+            this.opponent.TakeDamage(this.gameManager.CalculateDamage(input));
+
+            Debug.Log($"[{this.PlayerType}] Submit -> {input} (Synonyms: {string.Join(", ", word.Synonyms)} - Antonyms: {string.Join(", ", word.Antonyms)} - Related: {string.Join(", ", word.RelatedWords)})");
+        } else {
+            this.InputText = string.Empty;
+            this.InputTextUpdated?.Invoke(this, this.InputText);
+            this.InputSubmitted?.Invoke(this, input);
         }
-        
-        this.SubmittedStrings.Add(input);
-        this.InputSubmitted?.Invoke(this, input);
-
-        this.InputText = string.Empty;
-        this.InputTextUpdated?.Invoke(this, this.InputText);
-
-        this.opponent.TakeDamage(this.gameManager.CalculateDamage(input));
-
-        Debug.Log($"[{this.PlayerType}] Submit -> {input} (Synonyms: {string.Join(", ", word.Synonyms)} - Antonyms: {string.Join(", ", word.Antonyms)} - Related: {string.Join(", ", word.RelatedWords)})");
     }
 
     public void TakeDamage(int damage) {
@@ -110,4 +118,8 @@ public class PlayerController : MonoBehaviourPun {
         if (this.input) this.input.enabled = false;
         Debug.Log($"[{this.PlayerType}] Turn Ended");
     }
+
+    public void ToggleInput(bool enabled) => this.input.enabled = enabled;
+
+    private void GameStateChanged(GameState gameState) {}
 }

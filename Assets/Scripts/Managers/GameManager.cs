@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public PlayerController RemotePlayer => Players.Find(player => player.PlayerType == PlayerType.Remote);
     public WordDataList WordList { get; private set; }
     public readonly int MAX_PLAYERS = 2;
+    public GameState GameState { get; private set; } = GameState.None;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Binding localPlayerBinding;
     [SerializeField] private LetterValues letterValues;
@@ -25,6 +26,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     /// Called when a player is destroyed
     /// </summary>
     public Action<PlayerType> PlayerDestroyed;
+    public Action<GameState> GameStateChanged;
     # endregion
 
     private void Awake() {
@@ -57,17 +59,36 @@ public class GameManager : MonoBehaviourPunCallbacks {
         });
     }
 
-    public override void OnConnectedToMaster() => PhotonNetwork.JoinRandomRoom();
+    public override void OnConnectedToMaster() {
+        this.UpdateGameState(GameState.Menu);
+        PhotonNetwork.JoinRandomRoom();
+    }
 
     public override void OnConnected() => Debug.Log($"Connected to {PhotonNetwork.Server}");
 
     public override void OnPlayerEnteredRoom(Player remotePlayer) => Debug.Log($"Remote player joined the room");
 
     // TODO: Destroy room on player disconnect
-    public override void OnPlayerLeftRoom(Player remotePlayer) => Debug.Log($"Remote player left the room");
+    public override void OnPlayerLeftRoom(Player remotePlayer) {
+        PhotonNetwork.LeaveRoom();
+        this.UpdateGameState(GameState.PostGame);
+
+        Debug.Log($"Remote player left the room");
+    }
+
+    public override void OnLeftRoom() {
+        this.Players.Clear();
+    }
 
     public override void OnJoinedRoom() {
-        PhotonNetwork.Instantiate(this.playerPrefab.name, this.playerPrefab.transform.position, this.playerPrefab.transform.rotation).GetComponent<PlayerController>().gameObject.AddComponent<InputController>().Binding = this.localPlayerBinding;
+        PlayerController player = PhotonNetwork.Instantiate(this.playerPrefab.name, this.playerPrefab.transform.position, this.playerPrefab.transform.rotation).GetComponent<PlayerController>();
+        player.gameObject.AddComponent<InputController>().Binding = this.localPlayerBinding;
+
+        if (PhotonNetwork.LocalPlayer.NickName != string.Empty) {
+            this.UpdateGameState(GameState.Playing);
+        }
+
+        PhotonNetwork.CurrentRoom.IsOpen = this.GameState != GameState.Menu;
         Debug.Log($"Joined room {PhotonNetwork.CurrentRoom.Name}");
     }
 
@@ -83,7 +104,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
             this.Players.Sort((a, b) => a.photonView.ViewID - b.photonView.ViewID);
             this.PlayerInstantiated?.Invoke(player);
             player.InputSubmitted += this.NextTurn;
-            player.EndTurn();
+            player.InputSubmitted += this.InputSubmitted;
 
             if (this.Players.Count == MAX_PLAYERS) this.Players[0].StartTurn();
 
@@ -95,6 +116,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public void NextTurn(PlayerController _, string __) => this.NextTurn();
 
     public void NextTurn() {
+        if (this.GameState != GameState.Playing) return;
         this.turnCount++;
         PlayerController lastPlayer = this.Players[(this.turnCount - 1) % this.MAX_PLAYERS];
         PlayerController currentPlayer = this.Players[this.turnCount % this.MAX_PLAYERS];
@@ -108,5 +130,22 @@ public class GameManager : MonoBehaviourPunCallbacks {
         int damage = 0;
         foreach (char letter in word.ToLower()) damage += this.letterValues.GetValue(letter);
         return damage;
+    }
+
+    private void InputSubmitted(PlayerController player, string input) {
+        if (this.GameState == GameState.Menu) {
+            PhotonNetwork.LocalPlayer.NickName = input;
+            Debug.Log($"Player {player.photonView.ViewID} is now known as {input}");
+
+            this.UpdateGameState(GameState.Connecting);
+            PhotonNetwork.LeaveRoom();
+        }
+    }
+
+    private void UpdateGameState(GameState gameState) {
+        this.GameState = gameState;
+        this.GameStateChanged?.Invoke(gameState);
+
+        Debug.Log($"Game State changed to {gameState}");
     }
 }

@@ -36,8 +36,12 @@ public class UserInterfaceManager : MonoBehaviour {
             player.HealthUpdated += UpdatePlayerHealth;
             player.InputTextUpdated += UpdatePlayerInput;
             player.InputSubmitted += UpdatePlayerHistory;
+            this.UpdatePlayerName(player, player.photonView.Owner.NickName);
 
-            this.GetPlayerElements(player.PlayerType).Username.text = $"Player {player.photonView.ViewID}";
+            if (player.PlayerType == PlayerType.Local && this.gameManager.GameState == GameState.Menu) {
+                this.SetInstructionText("Pick a name to start");
+                player.ToggleInput(true);
+            }
         };
 
         this.gameManager.PlayerDestroyed += playerType => {
@@ -54,10 +58,6 @@ public class UserInterfaceManager : MonoBehaviour {
         PlayerElements playerElements = this.GetPlayerElements(playerType);
         playerElements.Panel.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
         this.instructionPanel.style.display = (enabled && playerType == PlayerType.Remote) ? DisplayStyle.None : DisplayStyle.Flex;
-
-        if (playerType == PlayerType.Local && enabled) {
-            this.SetInstructionText("Waiting for opponent...");
-        }
     }
 
     public void SetInstructionText(string text) {
@@ -88,6 +88,11 @@ public class UserInterfaceManager : MonoBehaviour {
         PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
         playerElements.InputHistory.text = string.Empty;
         Enumerable.Reverse(player.SubmittedStrings).Take(5).ToList().ForEach(word => playerElements.InputHistory.text += $"{word}\n");
+    }
+
+    private void UpdatePlayerName(PlayerController player, string name) {
+        PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
+        playerElements.Username.text = name;
     }
 
     private PlayerElements GetPlayerElements(PlayerType playerType) => this.playerElementsList.Find(playerElements => playerElements.PlayerType == playerType);

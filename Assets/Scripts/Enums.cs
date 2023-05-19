@@ -13,3 +13,11 @@ public enum WordType {
     Conjunction,
     Interjection
 }
+
+public enum GameState {
+    None,
+    Menu,
+    Connecting,
+    Playing,
+    PostGame
+}
