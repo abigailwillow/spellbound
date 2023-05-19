@@ -10,6 +10,8 @@ public class UserInterfaceManager : MonoBehaviour {
     private Label instructionLabel;
     private GameManager gameManager => GameManager.Instance;
     [SerializeField, Range(0f, 1f)] private float INSTRUCTION_ANIMATION_DELAY = 0.05f;
+    private string instructionText = string.Empty;
+    private float? instructionStartTime = null;
 
     private void Awake() {
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
@@ -39,7 +41,6 @@ public class UserInterfaceManager : MonoBehaviour {
             this.UpdatePlayerName(player, player.photonView.Owner.NickName);
 
             if (player.PlayerType == PlayerType.Local && this.gameManager.GameState == GameState.Menu) {
-                this.SetInstructionText("Pick a name to start");
                 player.ToggleInput(true);
             }
         };
@@ -47,6 +48,19 @@ public class UserInterfaceManager : MonoBehaviour {
         this.gameManager.PlayerDestroyed += playerType => {
             this.SetPlayerPanelActive(false, playerType);
         };
+
+        this.gameManager.GameStateChanged += GameStateUpdated;
+    }
+
+    private void Update() {
+        if (this.instructionStartTime != null && Time.time > instructionStartTime) {
+            float? timeSinceStart = Time.time - instructionStartTime;
+            int position = (int)(timeSinceStart / INSTRUCTION_ANIMATION_DELAY);
+            this.instructionLabel.text = this.instructionText.Substring(0, position);
+            if (position >= this.instructionText.Length) {
+                this.instructionStartTime = null;
+            }
+        }
     }
 
     /// <summary>
@@ -61,14 +75,8 @@ public class UserInterfaceManager : MonoBehaviour {
     }
 
     public void SetInstructionText(string text) {
-        this.instructionLabel.text = string.Empty;
-        StartCoroutine(AnimateInstructionText(text));
-    }
-
-    private IEnumerator AnimateInstructionText(string text, int position = 0) {
-        this.instructionLabel.text = text.Substring(0, ++position);
-        yield return new WaitForSeconds(INSTRUCTION_ANIMATION_DELAY);
-        if (position < text.Length) StartCoroutine(AnimateInstructionText(text, position));
+        this.instructionText = text;
+        this.instructionStartTime = Time.time;
     }
 
 
@@ -96,6 +104,23 @@ public class UserInterfaceManager : MonoBehaviour {
     }
 
     private PlayerElements GetPlayerElements(PlayerType playerType) => this.playerElementsList.Find(playerElements => playerElements.PlayerType == playerType);
+
+    private void GameStateUpdated(GameState gameState) {
+        switch (gameState) {
+            case GameState.Menu:
+                this.SetInstructionText("Pick a name to start");
+                break;
+            case GameState.Connecting:
+                this.SetInstructionText("Connecting...");
+                break;
+            case GameState.Playing:
+                this.SetInstructionText("");
+                break;
+            case GameState.PostGame:
+                this.SetInstructionText("Game Over");
+                break;
+        }
+    }
 
     private class PlayerElements {
         public PlayerElements(VisualElement playerPanel, PlayerType playerType) {
