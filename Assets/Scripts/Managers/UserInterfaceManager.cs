@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,7 +8,8 @@ public class UserInterfaceManager : MonoBehaviour {
     private VisualElement instructionPanel;
     private Label instructionLabel;
     private GameManager gameManager => GameManager.Instance;
-    [SerializeField, Range(0f, 1f)] private float INSTRUCTION_ANIMATION_DELAY = 0.05f;
+    [SerializeField, Range(0f, 1f)] private float instructionAnimationDelay = 0.05f;
+    [SerializeField, Range(0f, 1f)] private float instructionAnimationStartDelay = 0.25f;
     private string instructionText = string.Empty;
     private float? instructionStartTime = null;
 
@@ -55,7 +55,7 @@ public class UserInterfaceManager : MonoBehaviour {
     private void Update() {
         if (this.instructionStartTime != null && Time.time > instructionStartTime) {
             float? timeSinceStart = Time.time - instructionStartTime;
-            int position = (int)(timeSinceStart / INSTRUCTION_ANIMATION_DELAY);
+            int position = (int)(timeSinceStart / instructionAnimationDelay);
             this.instructionLabel.text = this.instructionText.Substring(0, position);
             if (position >= this.instructionText.Length) {
                 this.instructionStartTime = null;
@@ -75,8 +75,9 @@ public class UserInterfaceManager : MonoBehaviour {
     }
 
     public void SetInstructionText(string text) {
+        this.instructionLabel.text = string.Empty;
         this.instructionText = text;
-        this.instructionStartTime = Time.time;
+        this.instructionStartTime = Time.time + instructionAnimationStartDelay;
     }
 
 
