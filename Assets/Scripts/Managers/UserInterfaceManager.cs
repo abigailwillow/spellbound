@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -12,8 +13,8 @@ public class UserInterfaceManager : MonoBehaviour {
     [SerializeField, Range(0f, 1f)] private float instructionStartDelay = 0.25f;
     [SerializeField, Range(0f, 10f)] private float instructionTimeout = 2.5f;
     private string instructionText;
-    private string previousText;
     private float? instructionStartTime = null;
+    private Action instructionCallback = null;
 
     private void Awake() {
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
@@ -51,8 +52,6 @@ public class UserInterfaceManager : MonoBehaviour {
         this.gameManager.PlayerDestroyed += playerType => {
             this.SetPlayerPanelActive(false, playerType);
         };
-
-        this.gameManager.GameStateChanged += GameStateUpdated;
     }
 
     private void Update() {
@@ -61,9 +60,9 @@ public class UserInterfaceManager : MonoBehaviour {
             int position = (int)(timeSinceStart / instructionDelay);
 
             if (position > this.instructionText.Length) {
-                if (this.previousText != string.Empty) {
+                if (this.instructionCallback != null) {
                     if (timeSinceStart > (this.instructionDelay * this.instructionText.Length) + this.instructionTimeout) {
-                        this.SetInstructionText(this.previousText);
+                        this.instructionCallback?.Invoke();
                     }
                 } else {
                     this.instructionStartTime = null;
@@ -85,8 +84,8 @@ public class UserInterfaceManager : MonoBehaviour {
         this.instructionPanel.style.display = (enabled && playerType == PlayerType.Remote) ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
-    public void SetInstructionText(string text, bool revert = false) {
-        this.previousText = revert ? this.instructionText : string.Empty;
+    public void SetInstructionText(string text, Action callback = null) {
+        this.instructionCallback = callback;
         this.instructionLabel.text = string.Empty;
         this.instructionText = text;
         this.instructionStartTime = Time.time + instructionStartDelay;
@@ -117,23 +116,6 @@ public class UserInterfaceManager : MonoBehaviour {
     }
 
     private PlayerElements GetPlayerElements(PlayerType playerType) => this.playerElementsList.Find(playerElements => playerElements.PlayerType == playerType);
-
-    private void GameStateUpdated(GameState gameState) {
-        switch (gameState) {
-            case GameState.Menu:
-                this.SetInstructionText("Type START to start the game\nType NAME to change your name");
-                break;
-            case GameState.Connecting:
-                this.SetInstructionText("Connecting...");
-                break;
-            case GameState.Playing:
-                this.SetInstructionText("");
-                break;
-            case GameState.PostGame:
-                this.SetInstructionText("Game Over");
-                break;
-        }
-    }
 
     private class PlayerElements {
         public PlayerElements(VisualElement playerPanel, PlayerType playerType) {
