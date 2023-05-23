@@ -109,7 +109,7 @@ public class UserInterfaceManager : MonoBehaviour {
     private void GameStateUpdated(GameState gameState) {
         switch (gameState) {
             case GameState.Menu:
-                this.SetInstructionText("Pick a name to start");
+                this.SetInstructionText("Type START to start the game\nType NAME to change your name");
                 break;
             case GameState.Connecting:
                 this.SetInstructionText("Connecting...");

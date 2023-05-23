@@ -12,9 +12,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public WordDataList WordList { get; private set; }
     public readonly int MAX_PLAYERS = 2;
     public GameState GameState { get; private set; } = GameState.None;
+    [Header("Prefabs")]
     [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private GameObject userInterfacePrefab;
+    [Header("Miscellaneous")]
     [SerializeField] private Binding localPlayerBinding;
     [SerializeField] private LetterValues letterValues;
+    private UserInterfaceManager uiManager;
     private int turnCount = 0;
 
     # region Events
@@ -49,6 +53,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
         List<string> debugValues = new List<string>();
         foreach (char letter in "abcdefghijklmnopqrstuvwxyz") debugValues.Add($"{letter}: {this.letterValues.GetValue(letter)}");
         Debug.Log($"Letter Values: {string.Join(", ", debugValues)}");
+
+        this.uiManager = Instantiate(this.userInterfacePrefab).GetComponent<UserInterfaceManager>();
     }
 
     private void Update() {
@@ -103,7 +109,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
             this.Players.Add(player);
             this.Players.Sort((a, b) => a.photonView.ViewID - b.photonView.ViewID);
             this.PlayerInstantiated?.Invoke(player);
-            player.InputSubmitted += this.NextTurn;
             player.InputSubmitted += this.InputSubmitted;
 
             if (this.Players.Count == MAX_PLAYERS) this.Players[0].StartTurn();
@@ -113,7 +118,29 @@ public class GameManager : MonoBehaviourPunCallbacks {
         return valid;
     }
 
-    public void NextTurn(PlayerController _, string __) => this.NextTurn();
+    private void InputSubmitted(PlayerController player, string input) {
+        if (this.GameState == GameState.Menu) {
+            switch (input.ToLower()) {
+                case "start":
+                    if (PhotonNetwork.LocalPlayer.NickName != string.Empty) {
+                        this.UpdateGameState(GameState.Connecting);
+                        PhotonNetwork.LeaveRoom();
+                    } else {
+                        // TODO: Cannot start, no name
+                    }
+                    break;
+                case "name":
+                    // TODO: Name input
+                default:
+                    // TODO: Unknown command
+                    break;
+            }
+            PhotonNetwork.LocalPlayer.NickName = input;
+            Debug.Log($"Player {player.photonView.ViewID} is now known as {input}");
+        } else if (this.GameState == GameState.Playing) {
+            this.NextTurn();
+        }
+    }
 
     public void NextTurn() {
         if (this.GameState != GameState.Playing) return;
@@ -130,16 +157,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         int damage = 0;
         foreach (char letter in word.ToLower()) damage += this.letterValues.GetValue(letter);
         return damage;
-    }
-
-    private void InputSubmitted(PlayerController player, string input) {
-        if (this.GameState == GameState.Menu) {
-            PhotonNetwork.LocalPlayer.NickName = input;
-            Debug.Log($"Player {player.photonView.ViewID} is now known as {input}");
-
-            this.UpdateGameState(GameState.Connecting);
-            PhotonNetwork.LeaveRoom();
-        }
     }
 
     private void UpdateGameState(GameState gameState) {

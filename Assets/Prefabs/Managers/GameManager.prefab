@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 522415428453542352, guid: 2151659caf1397b45a834c0d3ba3f4ff, type: 3}
+  userInterfacePrefab: {fileID: 5164814511714259845, guid: b1c6629461d13994dbc6b4e940fa1b55, type: 3}
   localPlayerBinding: {fileID: 11400000, guid: 564540b37e52a464ab97500bd78b2975, type: 2}
   letterValues: {fileID: 11400000, guid: 9b72a9baa629cf147b5e4614157088cd, type: 2}
 --- !u!114 &718835662578800086
