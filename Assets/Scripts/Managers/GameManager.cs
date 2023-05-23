@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     [SerializeField] private LetterValues letterValues;
     private UserInterfaceManager uiManager;
     private int turnCount = 0;
+    private MenuState menuState = MenuState.None;
 
     # region Events
     /// <summary>
@@ -126,17 +127,25 @@ public class GameManager : MonoBehaviourPunCallbacks {
                         this.UpdateGameState(GameState.Connecting);
                         PhotonNetwork.LeaveRoom();
                     } else {
-                        // TODO: Cannot start, no name
+                        this.uiManager.SetInstructionText("Please pick a name first", true);
                     }
                     break;
                 case "name":
-                    // TODO: Name input
+                    this.uiManager.SetInstructionText("Please enter your name", false);
+                    this.menuState = MenuState.Name;
+                    break;
                 default:
-                    // TODO: Unknown command
+                    if (this.menuState == MenuState.Name) {
+                        this.uiManager.SetInstructionText($"Your name is now {input.ToUpper()}", true);
+                        PhotonNetwork.LocalPlayer.NickName = input;
+                        this.LocalPlayer.NameUpdated?.Invoke(this.LocalPlayer, input);
+                        Debug.Log($"Player {player.photonView.ViewID} is now known as {input}");
+                        this.menuState = MenuState.Menu;
+                    } else {
+                        this.uiManager.SetInstructionText($"Invalid command {input}", true);
+                    }
                     break;
             }
-            PhotonNetwork.LocalPlayer.NickName = input;
-            Debug.Log($"Player {player.photonView.ViewID} is now known as {input}");
         } else if (this.GameState == GameState.Playing) {
             this.NextTurn();
         }

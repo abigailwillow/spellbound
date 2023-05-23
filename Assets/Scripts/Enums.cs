@@ -21,3 +21,9 @@ public enum GameState {
     Playing,
     PostGame
 }
+
+public enum MenuState {
+    None,
+    Menu,
+    Name
+}

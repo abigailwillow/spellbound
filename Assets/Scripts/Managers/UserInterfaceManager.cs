@@ -8,9 +8,11 @@ public class UserInterfaceManager : MonoBehaviour {
     private VisualElement instructionPanel;
     private Label instructionLabel;
     private GameManager gameManager => GameManager.Instance;
-    [SerializeField, Range(0f, 1f)] private float instructionAnimationDelay = 0.05f;
-    [SerializeField, Range(0f, 1f)] private float instructionAnimationStartDelay = 0.25f;
-    private string instructionText = string.Empty;
+    [SerializeField, Range(0f, 1f)] private float instructionDelay = 0.05f;
+    [SerializeField, Range(0f, 1f)] private float instructionStartDelay = 0.25f;
+    [SerializeField, Range(0f, 10f)] private float instructionTimeout = 2.5f;
+    private string instructionText;
+    private string previousText;
     private float? instructionStartTime = null;
 
     private void Awake() {
@@ -38,6 +40,7 @@ public class UserInterfaceManager : MonoBehaviour {
             player.HealthUpdated += UpdatePlayerHealth;
             player.InputTextUpdated += UpdatePlayerInput;
             player.InputSubmitted += UpdatePlayerHistory;
+            player.NameUpdated += UpdatePlayerName;
             this.UpdatePlayerName(player, player.photonView.Owner.NickName);
 
             if (player.PlayerType == PlayerType.Local && this.gameManager.GameState == GameState.Menu) {
@@ -53,12 +56,20 @@ public class UserInterfaceManager : MonoBehaviour {
     }
 
     private void Update() {
-        if (this.instructionStartTime != null && Time.time > instructionStartTime) {
+        if (this.instructionStartTime != null && Time.time > this.instructionStartTime) {
             float? timeSinceStart = Time.time - instructionStartTime;
-            int position = (int)(timeSinceStart / instructionAnimationDelay);
-            this.instructionLabel.text = this.instructionText.Substring(0, position);
-            if (position >= this.instructionText.Length) {
-                this.instructionStartTime = null;
+            int position = (int)(timeSinceStart / instructionDelay);
+
+            if (position > this.instructionText.Length) {
+                if (this.previousText != string.Empty) {
+                    if (timeSinceStart > (this.instructionDelay * this.instructionText.Length) + this.instructionTimeout) {
+                        this.SetInstructionText(this.previousText);
+                    }
+                } else {
+                    this.instructionStartTime = null;
+                }
+            } else {
+                this.instructionLabel.text = this.instructionText.Substring(0, position);
             }
         }
     }
@@ -74,10 +85,11 @@ public class UserInterfaceManager : MonoBehaviour {
         this.instructionPanel.style.display = (enabled && playerType == PlayerType.Remote) ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
-    public void SetInstructionText(string text) {
+    public void SetInstructionText(string text, bool revert = false) {
+        this.previousText = revert ? this.instructionText : string.Empty;
         this.instructionLabel.text = string.Empty;
         this.instructionText = text;
-        this.instructionStartTime = Time.time + instructionAnimationStartDelay;
+        this.instructionStartTime = Time.time + instructionStartDelay;
     }
 
 

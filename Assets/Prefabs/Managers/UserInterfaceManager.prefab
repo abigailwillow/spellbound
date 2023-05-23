@@ -63,3 +63,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   instructionAnimationDelay: 0.05
   instructionAnimationStartDelay: 0.25
+  instructionTimeout: 2.5
