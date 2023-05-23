@@ -67,8 +67,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
     }
 
     public override void OnConnectedToMaster() {
-        this.SetGameState(GameState.Menu);
-        PhotonNetwork.JoinRandomRoom();
+        if (this.GameState == GameState.Connecting) {
+            PhotonNetwork.JoinRandomRoom();
+        } else {
+            PhotonNetwork.CreateRoom(null);
+            this.SetGameState(GameState.Menu);
+        }
     }
 
     public override void OnConnected() => Debug.Log($"Connected to {PhotonNetwork.Server}");
