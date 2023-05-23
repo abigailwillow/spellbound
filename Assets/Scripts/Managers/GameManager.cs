@@ -95,10 +95,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         PlayerController player = PhotonNetwork.Instantiate(this.playerPrefab.name, this.playerPrefab.transform.position, this.playerPrefab.transform.rotation).GetComponent<PlayerController>();
         player.gameObject.AddComponent<InputController>().Binding = this.localPlayerBinding;
 
-        if (PhotonNetwork.LocalPlayer.NickName != string.Empty) {
-            this.SetGameState(GameState.Playing);
-        }
-
         PhotonNetwork.CurrentRoom.IsOpen = this.GameState != GameState.Menu;
         Debug.Log($"Joined room {PhotonNetwork.CurrentRoom.Name}");
     }
@@ -141,6 +137,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                     if (this.menuState == MenuState.Name) {
                         PhotonNetwork.LocalPlayer.NickName = input;
                         this.LocalPlayer.NameUpdated?.Invoke(this.LocalPlayer, input);
+                        PlayerPrefs.SetString("Nickname", input);
                         this.uiManager.SetInstructionText($"Your name is now {input.ToUpper()}", () => this.SetMenuState(MenuState.Menu));
 
                         Debug.Log($"Player {player.photonView.ViewID} is now known as {input}");

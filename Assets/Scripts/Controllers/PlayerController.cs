@@ -35,6 +35,10 @@ public class PlayerController : MonoBehaviourPun {
 
     private void Awake() {
         this.Health = this.MaxHealth;
+
+        string playerPrefsNickname = PlayerPrefs.GetString("Nickname", "");
+        string photonNickname = PhotonNetwork.NickName;
+        PhotonNetwork.NickName = string.IsNullOrEmpty(photonNickname) ? playerPrefsNickname : photonNickname;
     }
 
     private void Start() {
