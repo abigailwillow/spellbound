@@ -70,7 +70,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         if (this.GameState == GameState.Connecting) {
             PhotonNetwork.JoinRandomRoom();
         } else {
-            PhotonNetwork.CreateRoom(null);
+            PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsVisible = false });
             this.SetGameState(GameState.Menu);
         }
     }
@@ -79,7 +79,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     public override void OnPlayerEnteredRoom(Player remotePlayer) => Debug.Log($"Remote player joined the room");
 
-    // TODO: Destroy room on player disconnect
     public override void OnPlayerLeftRoom(Player remotePlayer) {
         PhotonNetwork.LeaveRoom();
         this.SetGameState(GameState.PostGame);
@@ -95,13 +94,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
         PlayerController player = PhotonNetwork.Instantiate(this.playerPrefab.name, this.playerPrefab.transform.position, this.playerPrefab.transform.rotation).GetComponent<PlayerController>();
         player.gameObject.AddComponent<InputController>().Binding = this.localPlayerBinding;
 
-        PhotonNetwork.CurrentRoom.IsOpen = this.GameState != GameState.Menu;
         Debug.Log($"Joined room {PhotonNetwork.CurrentRoom.Name}");
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message) {
         Debug.Log($"Could not join a random room ({message}), creating a new room");
-        PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = (byte)this.MAX_PLAYERS });
+        PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = (byte)this.MAX_PLAYERS, IsVisible = true });
     }
 
     public bool AddPlayer(PlayerController player) {
@@ -176,6 +174,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 break;
             case GameState.Connecting:
                 this.uiManager.SetInstructionText("Connecting...");
+                // TODO: Add ability to abort connection and cycle messages to show that the game is still loading
                 break;
             case GameState.Playing:
                 this.uiManager.SetInstructionText("");
