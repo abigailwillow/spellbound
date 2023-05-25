@@ -21,6 +21,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private UserInterfaceManager uiManager;
     private int turnCount = 0;
     private MenuState menuState = MenuState.None;
+    private string[] connectingMesages = new string[] { "Connecting...", "Finding opponent...", "Still looking...", "Almost there..." };
+    private float connectingMessageDelay = 10f;
+    private float connectingMessageStartTime = 0f;
 
     # region Events
     /// <summary>
@@ -64,6 +67,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
             if (!player) return;
             player.transform.position = new Vector3(cameraHalfWidth * (player.PlayerType == PlayerType.Local ? -1 : 1), 0, 0);
         });
+
+        if (this.GameState == GameState.Connecting) {
+            if (this.connectingMessageStartTime <= Time.time) {
+                this.connectingMessageStartTime = this.connectingMessageDelay + Time.time;
+                this.uiManager.SetInstructionText(this.connectingMesages[UnityEngine.Random.Range(0, this.connectingMesages.Length)]);
+            }
+        }
     }
 
     public override void OnConnectedToMaster() {
