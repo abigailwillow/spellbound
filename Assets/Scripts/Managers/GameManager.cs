@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
     }
 
-    public override void OnConnected() => Debug.Log($"Connected to {PhotonNetwork.Server}");
+    public override void OnConnected() => Debug.Log($"Connected to {PhotonNetwork.Server} ({PhotonNetwork.CloudRegion.ToUpper()})");
 
     public override void OnPlayerEnteredRoom(Player remotePlayer) => Debug.Log($"Remote player joined the room");
 
@@ -110,7 +110,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
             this.PlayerInstantiated?.Invoke(player);
             player.InputSubmitted += this.InputSubmitted;
 
-            if (this.Players.Count == MAX_PLAYERS) this.Players[0].StartTurn();
+            if (this.Players.Count == MAX_PLAYERS) {
+                this.SetGameState(GameState.Playing);
+                this.Players[0].StartTurn();
+                this.Players[1].EndTurn();
+            }
 
             Debug.Log($"Player {player.photonView.ViewID} joined the game");
         }

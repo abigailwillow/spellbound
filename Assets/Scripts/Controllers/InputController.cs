@@ -10,6 +10,7 @@ public class InputController : MonoBehaviour {
             this.binding = value;
             this.binding.SubmitAction.performed += callback => this.OnSubmit();
             this.binding.BackspaceAction.performed += callback => this.OnBackspace();
+            this.binding?.OnEnable();
         }
     }
     private PlayerController playerController;
@@ -29,9 +30,7 @@ public class InputController : MonoBehaviour {
     }
 
     public void OnTextInput(char character) {
-        if (char.IsLetter(character)) {
-            this.playerController.TextInput(char.ToUpper(character).ToString());
-        }
+        if (char.IsLetter(character)) this.playerController.TextInput(character.ToString().ToUpper());
     }
 
     public void OnSubmit() => this.playerController.Submit();
