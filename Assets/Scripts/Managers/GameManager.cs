@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private UserInterfaceManager uiManager;
     private int turnCount = 0;
     private MenuState menuState = MenuState.None;
-    private string[] connectingMesages = new string[] { "Connecting...", "Finding opponent...", "Still looking...", "Almost there..." };
+    private string[] connectingMesages = new string[] { "Connecting...", "Finding opponent...", "Still looking...", "Almost there...", "You can type CANCEL to return..." };
     private float connectingMessageDelay = 10f;
     private float connectingMessageStartTime = 0f;
 
@@ -160,6 +160,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
             }
         } else if (this.GameState == GameState.Playing) {
             this.NextTurn();
+        } else if (this.GameState == GameState.Connecting) {
+            if (input.ToLower() == "cancel") {
+                this.SetGameState(GameState.Menu);
+                PhotonNetwork.LeaveRoom();
+            }
         }
     }
 
