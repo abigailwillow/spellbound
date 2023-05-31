@@ -193,7 +193,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 break;
             case GameState.Connecting:
                 this.uiManager.SetInstructionText("Connecting...");
-                // TODO: Add ability to abort connection and cycle messages to show that the game is still loading
                 break;
             case GameState.Playing:
                 this.uiManager.SetInstructionText("");
