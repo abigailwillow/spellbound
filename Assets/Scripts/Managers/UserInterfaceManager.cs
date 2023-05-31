@@ -52,6 +52,8 @@ public class UserInterfaceManager : MonoBehaviour {
         this.gameManager.PlayerDestroyed += playerType => {
             this.SetPlayerPanelActive(false, playerType);
         };
+
+        this.gameManager.GameStateChanged += GameStateChanged;
     }
 
     private void Update() {
@@ -116,6 +118,10 @@ public class UserInterfaceManager : MonoBehaviour {
     }
 
     private PlayerElements GetPlayerElements(PlayerType playerType) => this.playerElementsList.Find(playerElements => playerElements.PlayerType == playerType);
+
+    private void GameStateChanged(GameState gameState) {
+        this.GetPlayerElements(PlayerType.Local).HealthBar.visible = gameState == GameState.Playing;
+    }
 
     private class PlayerElements {
         public PlayerElements(VisualElement playerPanel, PlayerType playerType) {

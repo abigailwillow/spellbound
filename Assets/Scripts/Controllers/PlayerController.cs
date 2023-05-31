@@ -44,7 +44,6 @@ public class PlayerController : MonoBehaviourPun {
     private void Start() {
         this.TryGetComponent<InputController>(out input);
         this.gameManager.AddPlayer(this);
-        this.gameManager.GameStateChanged += this.GameStateChanged;
     }
     
     public void TextInput(string character) => this.photonView.RPC(nameof(RPCTextInput), RpcTarget.All, character);
@@ -124,6 +123,4 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     public void ToggleInput(bool enabled) => this.input.enabled = enabled;
-
-    private void GameStateChanged(GameState gameState) {}
 }

@@ -201,6 +201,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 this.uiManager.SetInstructionText("Game Over");
                 break;
         }
+        this.GameStateChanged?.Invoke(gameState);
+
         Debug.Log($"Game State changed to {gameState}");
     }
 
