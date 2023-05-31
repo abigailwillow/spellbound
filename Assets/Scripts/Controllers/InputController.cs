@@ -8,8 +8,8 @@ public class InputController : MonoBehaviour {
         get => this.binding;
         set {
             this.binding = value;
-            this.binding.SubmitAction.performed += callback => this.OnSubmit();
-            this.binding.BackspaceAction.performed += callback => this.OnBackspace();
+            this.binding.SubmitAction.performed += this.OnSubmit;
+            this.binding.BackspaceAction.performed += this.OnBackspace;
             this.binding?.OnEnable();
         }
     }
@@ -29,11 +29,17 @@ public class InputController : MonoBehaviour {
         this.Binding?.OnDisable();
     }
 
+    private void OnDestroy() {
+        Keyboard.current.onTextInput -= OnTextInput;
+        this.Binding.SubmitAction.performed -= this.OnSubmit;
+        this.Binding.BackspaceAction.performed -= this.OnBackspace;
+    }
+
     public void OnTextInput(char character) {
         if (char.IsLetter(character)) this.playerController.TextInput(character.ToString().ToUpper());
     }
 
-    public void OnSubmit() => this.playerController.Submit();
+    public void OnSubmit(InputAction.CallbackContext _) => this.playerController.Submit();
 
-    public void OnBackspace() => this.playerController.Backspace();
+    public void OnBackspace(InputAction.CallbackContext _) => this.playerController.Backspace();
 }
