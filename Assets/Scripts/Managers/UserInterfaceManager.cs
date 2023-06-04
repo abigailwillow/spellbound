@@ -54,6 +54,7 @@ public class UserInterfaceManager : MonoBehaviour {
         };
 
         this.gameManager.GameStateChanged += GameStateChanged;
+        this.gameManager.TurnIncremented += TurnIncremented;
     }
 
     private void Update() {
@@ -121,6 +122,11 @@ public class UserInterfaceManager : MonoBehaviour {
 
     private void GameStateChanged(GameState gameState) {
         this.GetPlayerElements(PlayerType.Local).HealthBar.visible = gameState == GameState.Playing;
+    }
+
+    private void TurnIncremented(PlayerController previousPlayer, PlayerController currentPlayer, int turn) {
+        this.GetPlayerElements(previousPlayer.PlayerType).Username.text = previousPlayer.photonView.Owner.NickName;
+        this.GetPlayerElements(currentPlayer.PlayerType).Username.text = $">{currentPlayer.photonView.Owner.NickName}<";
     }
 
     private class PlayerElements {

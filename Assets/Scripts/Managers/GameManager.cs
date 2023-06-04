@@ -35,6 +35,10 @@ public class GameManager : MonoBehaviourPunCallbacks {
     /// </summary>
     public Action<PlayerType> PlayerDestroyed;
     public Action<GameState> GameStateChanged;
+    /// <summary>
+    /// Called when the next turn is started. The first parameter is the previous player, the second parameter is the current player, and the third parameter is the turn count
+    /// </summary>
+    public Action<PlayerController, PlayerController, int> TurnIncremented;
     # endregion
 
     private void Awake() {
@@ -175,6 +179,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
         PlayerController currentPlayer = this.Players[this.turnCount % this.MAX_PLAYERS];
         lastPlayer.EndTurn();
         currentPlayer.StartTurn();
+
+        this.TurnIncremented?.Invoke(lastPlayer, currentPlayer, this.turnCount);
 
         Debug.Log($"End of turn {this.turnCount - 1}, starting turn {this.turnCount} (Player {currentPlayer.photonView.ViewID})");
     }
