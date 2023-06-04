@@ -102,6 +102,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     public override void OnLeftRoom() {
         this.Players.Clear();
+        this.turnCount = 0;
     }
 
     public override void OnJoinedRoom() {
