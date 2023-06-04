@@ -14,10 +14,20 @@ public class InputController : MonoBehaviour {
         }
     }
     private PlayerController playerController;
+    [SerializeField, Range(0f, 1f)] private float backspaceDelay = 0.5f;
+    [SerializeField, Range(0f, 0.1f)] private float backspaceRepeat = 0.03f;
+    private float backspaceTime = 0f;
 
     private void Awake() => TouchScreenKeyboard.Open("");
 
     private void Start() => this.playerController = this.GetComponent<PlayerController>();
+
+    private void Update() {
+        if (this.binding.BackspaceAction.IsPressed() && Time.time > this.backspaceTime) {
+            this.backspaceTime = Time.time + this.backspaceRepeat;
+            this.playerController.Backspace();
+        }
+    }
 
     private void OnEnable() {
         Keyboard.current.onTextInput += OnTextInput;
@@ -41,5 +51,8 @@ public class InputController : MonoBehaviour {
 
     public void OnSubmit(InputAction.CallbackContext _) => this.playerController.Submit();
 
-    public void OnBackspace(InputAction.CallbackContext _) => this.playerController.Backspace();
+    public void OnBackspace(InputAction.CallbackContext _) {
+        this.backspaceTime = Time.time + this.backspaceDelay;
+        this.playerController.Backspace();
+    }
 }
