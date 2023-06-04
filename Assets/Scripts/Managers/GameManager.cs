@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     [SerializeField] private Binding localPlayerBinding;
     [SerializeField] private LetterValues letterValues;
     private UserInterfaceManager uiManager;
-    private int turnCount = 0;
+    private int turnCount = -1;
     private MenuState menuState = MenuState.None;
     private string[] connectingMesages = new string[] { "Connecting...", "Finding opponent...", "Still looking...", "Almost there...", "You can type CANCEL to return..." };
     private float connectingMessageDelay = 10f;
@@ -102,7 +102,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     public override void OnLeftRoom() {
         this.Players.Clear();
-        this.turnCount = 0;
+        this.turnCount = -1;
     }
 
     public override void OnJoinedRoom() {
@@ -127,8 +127,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
             if (this.Players.Count == MAX_PLAYERS) {
                 this.SetGameState(GameState.Playing);
-                this.Players[0].StartTurn();
-                this.Players[1].EndTurn();
+                this.NextTurn();
             }
 
             Debug.Log($"Player {player.photonView.ViewID} joined the game");
@@ -176,8 +175,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public void NextTurn() {
         if (this.GameState != GameState.Playing) return;
         this.turnCount++;
-        PlayerController lastPlayer = this.Players[(this.turnCount - 1) % this.MAX_PLAYERS];
-        PlayerController currentPlayer = this.Players[this.turnCount % this.MAX_PLAYERS];
+        PlayerController lastPlayer = this.turnCount > 0 ? this.Players[(this.turnCount - 1) % this.MAX_PLAYERS] : this.Players[1];
+        PlayerController currentPlayer = this.turnCount > 0 ? this.Players[this.turnCount % this.MAX_PLAYERS] : this.Players[0];
         lastPlayer.EndTurn();
         currentPlayer.StartTurn();
 
