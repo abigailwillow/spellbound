@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private string[] connectingMesages = new string[] { "Connecting...", "Finding opponent...", "Still looking...", "Almost there...", "You can type CANCEL to return..." };
     private float connectingMessageDelay = 10f;
     private float connectingMessageStartTime = 0f;
+    private PlayerType winner = PlayerType.None;
+    private WinReason winReason = WinReason.None;
 
     # region Events
     /// <summary>
@@ -83,6 +85,28 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public override void OnConnectedToMaster() {
         if (this.GameState == GameState.Connecting) {
             PhotonNetwork.JoinRandomRoom();
+        } else if (this.GameState == GameState.PostGame) {
+            PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsVisible = false });
+            string winnerName = this.winner == PlayerType.Local ? "You" : "Your opponent";
+            string loserName = this.winner == PlayerType.Local ? "your opponent" : "you";
+
+            string reason;
+            switch (this.winReason) {
+                case WinReason.Disconnect:
+                    reason = $"disconnected";
+                    break;
+                case WinReason.Health:
+                    reason = $"ran out of health";
+                    break;
+                case WinReason.Time:
+                    reason = $"ran out of time";
+                    break;
+                default:
+                    reason = "won";
+                    break;
+            }
+
+            this.uiManager.SetInstructionText($"{winnerName} won because {loserName} {reason}", () => this.SetGameState(GameState.Menu));
         } else {
             PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsVisible = false });
             this.SetGameState(GameState.Menu);
@@ -94,8 +118,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public override void OnPlayerEnteredRoom(Player remotePlayer) => Debug.Log($"Remote player joined the room");
 
     public override void OnPlayerLeftRoom(Player remotePlayer) {
-        PhotonNetwork.LeaveRoom();
-        this.SetGameState(GameState.PostGame);
+        if (this.GameState == GameState.Playing) this.SetPostGame(PlayerType.Local, WinReason.Disconnect);
 
         Debug.Log($"Remote player left the room");
     }
@@ -103,6 +126,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public override void OnLeftRoom() {
         this.Players.Clear();
         this.turnCount = -1;
+        if (this.GameState == GameState.Playing) this.SetPostGame(PlayerType.Remote, WinReason.Disconnect);
     }
 
     public override void OnJoinedRoom() {
@@ -222,5 +246,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 this.uiManager.SetInstructionText("Type START to start the game\nType NAME to change your name");
                 break;
         }
+    }
+
+    public void SetPostGame(PlayerType winner, WinReason winReason) {
+        this.winner = winner;
+        this.winReason = winReason;
+        this.SetGameState(GameState.PostGame);
+        PhotonNetwork.LeaveRoom();
     }
 }

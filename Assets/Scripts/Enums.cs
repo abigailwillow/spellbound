@@ -1,4 +1,5 @@
 public enum PlayerType {
+    None,
     Local,
     Remote
 }
@@ -26,4 +27,11 @@ public enum MenuState {
     None,
     Menu,
     Name
+}
+
+public enum WinReason {
+    None,
+    Health,
+    Time,
+    Disconnect
 }

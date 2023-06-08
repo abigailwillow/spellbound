@@ -108,7 +108,11 @@ public class PlayerController : MonoBehaviourPun {
         Debug.Log($"[{this.PlayerType}] Damage -> {damage} ({this.Health}/{this.MaxHealth})");
     }
 
-    private void Die() => Debug.Log($"[{this.PlayerType}] Died");
+    private void Die() {
+        this.gameManager.SetPostGame(this.opponent.PlayerType, WinReason.Health);
+
+        Debug.Log($"[{this.PlayerType}] Died");
+    }
 
     private void OnDestroy() => this.gameManager.PlayerDestroyed?.Invoke(this.PlayerType);
 
