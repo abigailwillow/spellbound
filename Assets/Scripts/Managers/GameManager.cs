@@ -197,7 +197,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 }
             }
         } else if (this.GameState == GameState.Playing) {
-            this.NextTurn();
+            if (input.ToLower() == "exit" && player.PlayerType == PlayerType.Local) {
+                this.SetPostGame(PlayerType.Remote, WinReason.Disconnect);
+            } else {
+                this.NextTurn();
+            }
         } else if (this.GameState == GameState.Connecting) {
             if (input.ToLower() == "cancel") {
                 this.SetGameState(GameState.Menu);
@@ -244,7 +248,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 this.uiManager.SetInstruction("");
                 break;
             case GameState.PostGame:
-                this.uiManager.SetInstruction("Game Over");
+                this.uiManager.SetInstruction("Lost connection to the server");
                 break;
         }
     }

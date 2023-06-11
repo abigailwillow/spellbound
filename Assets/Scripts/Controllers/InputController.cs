@@ -4,21 +4,11 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerController))]
 public class InputController : MonoBehaviour {
     private Binding binding;
-    public Binding Binding {
-        get => this.binding;
-        set {
-            this.binding = value;
-            this.binding.SubmitAction.performed += this.OnSubmit;
-            this.binding.BackspaceAction.performed += this.OnBackspace;
-            this.binding?.OnEnable();
-        }
-    }
+    public Binding Binding { get => this.binding; set => this.SetupBinding(value); }
     private PlayerController playerController;
     [SerializeField, Range(0f, 1f)] private float backspaceDelay = 0.5f;
     [SerializeField, Range(0f, 0.1f)] private float backspaceRepeat = 0.03f;
     private float backspaceTime = 0f;
-
-    private void Awake() => TouchScreenKeyboard.Open("");
 
     private void Start() => this.playerController = this.GetComponent<PlayerController>();
 
@@ -29,14 +19,12 @@ public class InputController : MonoBehaviour {
         }
     }
 
-    private void OnEnable() {
+    private void SetupBinding(Binding binding) {
+        this.binding = binding;
         Keyboard.current.onTextInput += OnTextInput;
-        this.Binding?.OnEnable();
-    }
-
-    private void OnDisable() {
-        Keyboard.current.onTextInput -= OnTextInput;
-        this.Binding?.OnDisable();
+        this.binding.SubmitAction.performed += this.OnSubmit;
+        this.binding.BackspaceAction.performed += this.OnBackspace;
+        this.binding?.OnEnable();
     }
 
     private void OnDestroy() {

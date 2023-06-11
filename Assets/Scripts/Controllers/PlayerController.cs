@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -9,13 +10,15 @@ public class PlayerController : MonoBehaviourPun {
     public int MaxHealth => this.maxHealth;
     public int Health { get; private set; }
     public PlayerType PlayerType => this.photonView.IsMine ? PlayerType.Local : PlayerType.Remote;
-    public string InputText { get; private set; }
+    public string InputText { get; private set; } = string.Empty;
     public List<string> SubmittedStrings { get; private set; } = new List<string>();
     public string LastSubmittedString => this.SubmittedStrings.Count > 0 ? this.SubmittedStrings[this.SubmittedStrings.Count - 1] : string.Empty;
     private PlayerController opponent => this.PlayerType == PlayerType.Local ? gameManager.RemotePlayer : gameManager.LocalPlayer;
     private GameManager gameManager => GameManager.Instance;
     private WordDataList wordList => this.gameManager.WordList;
     private InputController input;
+    private string exit = "EXIT";
+
 
     # region Events
     /// <summary>
@@ -46,7 +49,10 @@ public class PlayerController : MonoBehaviourPun {
         this.gameManager.AddPlayer(this);
     }
     
-    public void TextInput(string character) => this.photonView.RPC(nameof(RPCTextInput), RpcTarget.All, character);
+    public void TextInput(string character) {
+        if (!this.input.enabled && character != this.exit.ElementAtOrDefault(this.InputText.Length).ToString()) return;
+        this.photonView.RPC(nameof(RPCTextInput), RpcTarget.All, character);
+    }
 
     [PunRPC] public void RPCTextInput(string character) {
         this.InputText += character;
@@ -72,7 +78,9 @@ public class PlayerController : MonoBehaviourPun {
     [PunRPC] public void RPCSubmit(string input) {
         if (string.IsNullOrEmpty(input)) return;
         if (this.gameManager.GameState == GameState.Playing) {
-            if (!this.wordList.Contains(input)) { Debug.Log($"[{this.PlayerType}] Not a valid word ({input})"); return; }
+            if (!this.wordList.Contains(input) && input != this.exit) { Debug.Log($"[{this.PlayerType}] Not a valid word ({input})"); return; }
+            if (input == this.exit) { this.SubmitInput(input); return; }
+
             WordData word = this.wordList.Get(input);
 
             if (this.wordList.Contains(this.opponent.LastSubmittedString)) {
@@ -83,19 +91,20 @@ public class PlayerController : MonoBehaviourPun {
             }
             
             this.SubmittedStrings.Add(input);
-            this.InputSubmitted?.Invoke(this, input);
-
-            this.InputText = string.Empty;
-            this.InputTextUpdated?.Invoke(this, this.InputText);
+            this.SubmitInput(string.Empty);
 
             this.opponent.TakeDamage(this.gameManager.CalculateDamage(input));
 
             Debug.Log($"[{this.PlayerType}] Submit -> {input} (Synonyms: {string.Join(", ", word.Synonyms)} - Antonyms: {string.Join(", ", word.Antonyms)} - Related: {string.Join(", ", word.RelatedWords)})");
         } else {
-            this.InputText = string.Empty;
-            this.InputTextUpdated?.Invoke(this, this.InputText);
-            this.InputSubmitted?.Invoke(this, input);
+            this.SubmitInput(input);
         }
+    }
+
+    private void SubmitInput(string input) {
+        this.InputText = string.Empty;
+        this.InputTextUpdated?.Invoke(this, this.InputText);
+        this.InputSubmitted?.Invoke(this, input);
     }
 
     public void TakeDamage(int damage) {
