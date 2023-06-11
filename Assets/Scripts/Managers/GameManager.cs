@@ -91,26 +91,17 @@ public class GameManager : MonoBehaviourPunCallbacks {
             PhotonNetwork.JoinRandomRoom();
         } else if (this.GameState == GameState.PostGame) {
             PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsVisible = false });
-            string winnerName = this.winner == PlayerType.Local ? "You" : "Your opponent";
-            string loserName = this.winner == PlayerType.Local ? "your opponent" : "you";
+            string loser = this.winner == PlayerType.Local ? "your opponent" : "you";
+            string result = this.winner == PlayerType.Local ? "WON" : "LOST";
 
-            string reason;
-            switch (this.winReason) {
-                case WinReason.Disconnect:
-                    reason = $"disconnected";
-                    break;
-                case WinReason.Health:
-                    reason = $"ran out of health";
-                    break;
-                case WinReason.Time:
-                    reason = $"ran out of time";
-                    break;
-                default:
-                    reason = "won";
-                    break;
-            }
+            string reason = this.winReason switch {
+                WinReason.Disconnect => "disconnected",
+                WinReason.Health => "ran out of health",
+                WinReason.Time => "ran out of time",
+                _ => "won"
+            };
 
-            this.uiManager.SetInstruction($"{winnerName} won because {loserName} {reason}", () => this.SetGameState(GameState.Menu));
+            this.uiManager.SetInstruction($"You {result} because {loser} {reason}", () => this.SetGameState(GameState.Menu));
         } else {
             PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsVisible = false });
             this.SetGameState(GameState.Menu);
