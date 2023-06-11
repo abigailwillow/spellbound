@@ -26,7 +26,8 @@ public enum GameState {
 public enum MenuState {
     None,
     Menu,
-    Name
+    Name,
+    Tutorial
 }
 
 public enum WinReason {

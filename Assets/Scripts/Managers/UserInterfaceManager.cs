@@ -12,8 +12,8 @@ public class UserInterfaceManager : MonoBehaviour {
     [SerializeField, Range(0f, 1f)] private float instructionDelay = 0.05f;
     [SerializeField, Range(0f, 1f)] private float instructionStartDelay = 0.25f;
     [SerializeField, Range(0f, 10f)] private float instructionTimeout = 2.5f;
-    private string instructionText;
-    private float? instructionStartTime = null;
+    private List<string> instructions = new List<string>();
+    private float? instructionStart = null;
     private Action instructionCallback = null;
 
     private void Awake() {
@@ -58,20 +58,25 @@ public class UserInterfaceManager : MonoBehaviour {
     }
 
     private void Update() {
-        if (this.instructionStartTime != null && Time.time > this.instructionStartTime) {
-            float? timeSinceStart = Time.time - instructionStartTime;
+        // If there are instructions to display and the start time is in the past
+        if (this.instructions.Count > 0 && Time.time > this.instructionStart) {
+            float? timeSinceStart = Time.time - instructionStart;
             int position = (int)(timeSinceStart / instructionDelay);
+            float duration = this.instructionDelay * this.instructions[0].Length;
 
-            if (position > this.instructionText.Length) {
-                if (this.instructionCallback != null) {
-                    if (timeSinceStart > (this.instructionDelay * this.instructionText.Length) + this.instructionTimeout) {
+            // If the current instruction is finished
+            if (position > this.instructions[0].Length) {
+                // If the time has exceeded the duration of the instruction plus the timeout
+                if (timeSinceStart > duration + this.instructionTimeout) {
+                    this.instructionStart = this.instructions.Count > 1 ? Time.time + this.instructionStartDelay : null;
+                    this.instructions.RemoveAt(0);
+                    // If a callback exists and there are no more instructions
+                    if (this.instructionCallback != null && this.instructions.Count < 1) {
                         this.instructionCallback?.Invoke();
                     }
-                } else {
-                    this.instructionStartTime = null;
                 }
             } else {
-                this.instructionLabel.text = this.instructionText.Substring(0, position);
+                this.instructionLabel.text = this.instructions[0].Substring(0, position);
             }
         }
     }
@@ -87,13 +92,16 @@ public class UserInterfaceManager : MonoBehaviour {
         this.instructionPanel.style.display = (enabled && playerType == PlayerType.Remote) ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
-    public void SetInstructionText(string text, Action callback = null) {
-        this.instructionCallback = callback;
+    public void SetInstruction(Action callback, params string[] strings) {
         this.instructionLabel.text = string.Empty;
-        this.instructionText = text;
-        this.instructionStartTime = Time.time + instructionStartDelay;
+        this.instructionCallback = callback;
+        this.instructions = strings.ToList();
+        this.instructionStart = Time.time + this.instructionStartDelay;
     }
 
+    public void SetInstruction(string text, Action callback = null) => this.SetInstruction(callback, text);
+
+    public void SetInstruction(params string[] strings) => this.SetInstruction(null, strings);
 
     private void UpdatePlayerHealth(PlayerController player, int health) {
         PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
