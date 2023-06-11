@@ -160,7 +160,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 if (input.ToLower() == "spellbound") {
                     this.uiManager.SetInstruction(() => this.SetMenuState(MenuState.Name),
                         "You just cast your first spell!",
-                        "That's all there is to it\nYou now know how to play the game",
+                        "That's all there is to it\nYou now know how to play Spellbound",
                         "One last thing, you have to pick a name before you start playing\nYou can change it at any time",
                         "Have fun casting spells!"
                     );
@@ -266,7 +266,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 this.uiManager.SetInstruction(
                     "Welcome to Spellbound!",
                     "In this game players take turns spelling words to cast spells on each other",
-                    "The longer the word, and less common the letters, the more damage your spell will do",
+                    "The longer the word, and less common the letters, the more damage your spell will inflict",
                     "You can type EXIT during a game to return to the menu",
                     "Type SPELLBOUND to get started"
                 );
