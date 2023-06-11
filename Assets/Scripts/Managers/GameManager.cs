@@ -188,6 +188,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
                     case "name":
                         this.SetMenuState(MenuState.Name);
                         break;
+                    case "tutorial":
+                        this.SetMenuState(MenuState.Tutorial);
+                        break;
                     default:
                         if (this.menuState == MenuState.Name) {
                             PhotonNetwork.LocalPlayer.NickName = input;
@@ -241,7 +244,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         switch (gameState) {
             case GameState.Menu:
-                this.uiManager.SetInstruction("Type START to start the game\nType NAME to change your name");
+                this.uiManager.SetInstruction("Type START to start the game\nType NAME to change your name\nType TUTORIAL to play the tutorial");
                 break;
             case GameState.Connecting:
                 this.uiManager.SetInstruction("Connecting...");
@@ -262,7 +265,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 this.uiManager.SetInstruction("Please enter your name");
                 break;
             case MenuState.Menu:
-                this.uiManager.SetInstruction("Type START to start the game\nType NAME to change your name");
+                this.uiManager.SetInstruction("Type START to start the game\nType NAME to change your name\nType TUTORIAL to play the tutorial");
                 break;
             case MenuState.Tutorial:
                 this.uiManager.SetInstruction(
