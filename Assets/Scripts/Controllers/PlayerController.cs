@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviourPun {
     private WordDataList wordList => this.gameManager.WordList;
     private InputController input;
     private string exit = "EXIT";
+    [SerializeField] private int minimumSpecialDamage = 10;
 
 
     # region Events
@@ -82,18 +83,12 @@ public class PlayerController : MonoBehaviourPun {
             if (input == this.exit) { this.SubmitInput(input); return; }
 
             WordData word = this.wordList.Get(input);
-
-            if (this.wordList.Contains(this.opponent.LastSubmittedString)) {
-                WordData opponentWord = this.wordList.Get(this.opponent.LastSubmittedString);
-                if (opponentWord.IsSynonym(input)) Debug.Log($"[{this.PlayerType}] SYNONYM -> {input}");
-                if (opponentWord.IsAntonym(input)) Debug.Log($"[{this.PlayerType}] ANTONYM -> {input}");
-                if (opponentWord.IsRelated(input)) Debug.Log($"[{this.PlayerType}] RELATED -> {input}");
-            }
+            WordRelation relation = this.GetWordRelation(input);
             
             this.SubmittedStrings.Add(input);
             this.SubmitInput(string.Empty);
 
-            this.opponent.TakeDamage(this.gameManager.CalculateDamage(input));
+            this.opponent.TakeDamage(this.CalculateDamage(input, relation));
 
             Debug.Log($"[{this.PlayerType}] Submit -> {input} (Synonyms: {string.Join(", ", word.Synonyms)} - Antonyms: {string.Join(", ", word.Antonyms)} - Related: {string.Join(", ", word.RelatedWords)})");
         } else {
@@ -114,7 +109,14 @@ public class PlayerController : MonoBehaviourPun {
         }
         this.HealthUpdated?.Invoke(this, this.Health);
 
-        Debug.Log($"[{this.PlayerType}] Damage -> {damage} ({this.Health}/{this.MaxHealth})");
+        Debug.Log($"[{this.PlayerType}] Damaged -> {damage} ({this.Health}/{this.MaxHealth})");
+    }
+
+    public void Heal(int amount) {
+        this.Health = Mathf.Min(this.MaxHealth, this.Health + amount);
+        this.HealthUpdated?.Invoke(this, this.Health);
+
+        Debug.Log($"[{this.PlayerType}] Healed -> {amount} ({this.Health}/{this.MaxHealth})");
     }
 
     private void Die() {
@@ -136,4 +138,34 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     public void ToggleInput(bool enabled) => this.input.enabled = enabled;
+
+    private WordRelation GetWordRelation(string word) {
+        if (this.wordList.Contains(this.opponent.LastSubmittedString)) {
+            WordData opponentWord = this.wordList.Get(this.opponent.LastSubmittedString);
+            WordRelation relation = word switch {
+                _ when opponentWord.IsSynonym(word) => WordRelation.Synonym,
+                _ when opponentWord.IsAntonym(word) => WordRelation.Antonym,
+                _ when opponentWord.IsRelated(word) => WordRelation.Related,
+                _ => WordRelation.None
+            };
+
+            Debug.Log($"[{this.PlayerType}] {relation.ToString().ToUpper()} -> {word}");
+
+            return relation;
+        }
+        return WordRelation.None;
+    }
+
+    private int CalculateDamage(string word, WordRelation relation) {
+        int baseDamage = this.gameManager.CalculateDamage(word);
+        int opponentDamage = this.gameManager.CalculateDamage(this.opponent.LastSubmittedString);
+        if (baseDamage < this.minimumSpecialDamage) return baseDamage;
+        int damage = relation switch {
+            WordRelation.Synonym => baseDamage, // TODO: Heal player 2x the amount of opponent's damage
+            WordRelation.Antonym => opponentDamage * 2,
+            WordRelation.Related => baseDamage * 2,
+            _ => baseDamage
+        };
+        return damage;
+    }
 }

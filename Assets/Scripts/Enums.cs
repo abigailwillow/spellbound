@@ -36,3 +36,10 @@ public enum WinReason {
     Time,
     Disconnect
 }
+
+public enum WordRelation {
+    None,
+    Synonym,
+    Antonym,
+    Related
+}
