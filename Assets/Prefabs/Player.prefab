@@ -99,6 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  minimumSpecialDamage: 10
 --- !u!114 &75892096413606024
 MonoBehaviour:
   m_ObjectHideFlags: 0

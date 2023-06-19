@@ -88,7 +88,12 @@ public class PlayerController : MonoBehaviourPun {
             this.SubmittedStrings.Add(input);
             this.SubmitInput(string.Empty);
 
-            this.opponent.TakeDamage(this.CalculateDamage(input, relation));
+            int damage = this.CalculateDamage(input, relation);
+            if (relation == WordRelation.Synonym) {
+                this.Heal(damage);
+            } else {
+                this.opponent.TakeDamage(damage);
+            }
 
             Debug.Log($"[{this.PlayerType}] Submit -> {input} (Synonyms: {string.Join(", ", word.Synonyms)} - Antonyms: {string.Join(", ", word.Antonyms)} - Related: {string.Join(", ", word.RelatedWords)})");
         } else {
@@ -161,7 +166,7 @@ public class PlayerController : MonoBehaviourPun {
         int opponentDamage = this.gameManager.CalculateDamage(this.opponent.LastSubmittedString);
         if (baseDamage < this.minimumSpecialDamage) return baseDamage;
         int damage = relation switch {
-            WordRelation.Synonym => baseDamage, // TODO: Heal player 2x the amount of opponent's damage
+            WordRelation.Synonym => baseDamage * 2,
             WordRelation.Antonym => opponentDamage * 2,
             WordRelation.Related => baseDamage * 2,
             _ => baseDamage
