@@ -56,7 +56,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.PrefabPool.Register(this.playerPrefab);
         PhotonNetwork.ConnectUsingSettings();
 
-        WordList = WordDataList.Deserialize(Resources.Load<TextAsset>("Words"));
+        WordList = WordDataList.Deserialize(Resources.Load<TextAsset>("ExtendedWords"));
         Debug.Log($"Loaded {WordList.Words.Count} words");
         Debug.Log($"Valid Words: {string.Join(", ", WordList.Words.ConvertAll(word => word.Word))}");
 
@@ -272,7 +272,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 );
                 break;
         }
-        
+
         Debug.Log($"Menu State changed to {menuState}");
     }
 
