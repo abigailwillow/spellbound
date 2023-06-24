@@ -18,7 +18,6 @@ public class PlayerController : MonoBehaviourPun {
     private WordDataList wordList => this.gameManager.WordList;
     private InputController input;
     private string exit = "EXIT";
-    [SerializeField] private int minimumSpecialDamage = 10;
 
 
     # region Events
@@ -164,7 +163,6 @@ public class PlayerController : MonoBehaviourPun {
     private int CalculateDamage(string word, WordRelation relation) {
         int baseDamage = this.gameManager.CalculateDamage(word);
         int opponentDamage = this.gameManager.CalculateDamage(this.opponent.LastSubmittedString);
-        if (baseDamage < this.minimumSpecialDamage) return baseDamage;
         int damage = relation switch {
             WordRelation.Synonym => baseDamage * 2,
             WordRelation.Antonym => opponentDamage * 2,
