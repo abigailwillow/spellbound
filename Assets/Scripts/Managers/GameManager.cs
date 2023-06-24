@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
             this.Players.Add(player);
             this.Players.Sort((a, b) => a.photonView.ViewID - b.photonView.ViewID);
             this.PlayerInstantiated?.Invoke(player);
-            player.InputSubmitted += this.InputSubmitted;
+            player.WordSubmitted += this.InputSubmitted;
 
             if (this.Players.Count == MAX_PLAYERS) {
                 this.SetGameState(GameState.Playing);
@@ -154,7 +154,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         return valid;
     }
 
-    private void InputSubmitted(PlayerController player, string input) {
+    private void InputSubmitted(PlayerController player, string input, WordRelation relation) {
         if (this.GameState == GameState.Menu) {
             if (this.menuState == MenuState.Tutorial) {
                 if (input.ToLower() == "spellbound") {

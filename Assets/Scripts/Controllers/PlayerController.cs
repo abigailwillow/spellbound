@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviourPun {
     public string InputText { get; private set; } = string.Empty;
     public List<string> SubmittedStrings { get; private set; } = new List<string>();
     public string LastSubmittedString => this.SubmittedStrings.Count > 0 ? this.SubmittedStrings[this.SubmittedStrings.Count - 1] : string.Empty;
-    private PlayerController opponent => this.PlayerType == PlayerType.Local ? gameManager.RemotePlayer : gameManager.LocalPlayer;
+    public PlayerController Opponent => this.PlayerType == PlayerType.Local ? gameManager.RemotePlayer : gameManager.LocalPlayer;
     private GameManager gameManager => GameManager.Instance;
     private WordDataList wordList => this.gameManager.WordList;
     private InputController input;
@@ -32,8 +32,8 @@ public class PlayerController : MonoBehaviourPun {
     /// <summary>
     /// Called when the player submits a word
     /// </summary>
-    public Action<PlayerController, string> InputSubmitted;
-    public Action<PlayerController, string> NameUpdated; 
+    public Action<PlayerController, string, WordRelation> WordSubmitted;
+    public Action<PlayerController, string> NameUpdated;
     # endregion
 
     private void Awake() {
@@ -85,13 +85,13 @@ public class PlayerController : MonoBehaviourPun {
             WordRelation relation = this.GetWordRelation(input);
             
             this.SubmittedStrings.Add(input);
-            this.SubmitInput(string.Empty);
+            this.SubmitInput(input, relation);
 
             int damage = this.CalculateDamage(input, relation);
             if (relation == WordRelation.Synonym) {
                 this.Heal(damage);
             } else {
-                this.opponent.TakeDamage(damage);
+                this.Opponent.TakeDamage(damage);
             }
 
             Debug.Log($"[{this.PlayerType}] Submit -> {input} (Synonyms: {string.Join(", ", word.Synonyms)} - Antonyms: {string.Join(", ", word.Antonyms)} - Related: {string.Join(", ", word.RelatedWords)})");
@@ -100,10 +100,10 @@ public class PlayerController : MonoBehaviourPun {
         }
     }
 
-    private void SubmitInput(string input) {
+    private void SubmitInput(string input, WordRelation relation = WordRelation.None) {
         this.InputText = string.Empty;
         this.InputTextUpdated?.Invoke(this, this.InputText);
-        this.InputSubmitted?.Invoke(this, input);
+        this.WordSubmitted?.Invoke(this, input, relation);
     }
 
     public void TakeDamage(int damage) {
@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     private void Die() {
-        this.gameManager.SetPostGame(this.opponent.PlayerType, WinReason.Health);
+        this.gameManager.SetPostGame(this.Opponent.PlayerType, WinReason.Health);
 
         Debug.Log($"[{this.PlayerType}] Died");
     }
@@ -144,8 +144,8 @@ public class PlayerController : MonoBehaviourPun {
     public void ToggleInput(bool enabled) => this.input.enabled = enabled;
 
     private WordRelation GetWordRelation(string word) {
-        if (this.wordList.Contains(this.opponent.LastSubmittedString)) {
-            WordData opponentWord = this.wordList.Get(this.opponent.LastSubmittedString);
+        if (this.wordList.Contains(this.Opponent.LastSubmittedString)) {
+            WordData opponentWord = this.wordList.Get(this.Opponent.LastSubmittedString);
             WordRelation relation = word switch {
                 _ when opponentWord.IsSynonym(word) => WordRelation.Synonym,
                 _ when opponentWord.IsAntonym(word) => WordRelation.Antonym,
@@ -162,7 +162,7 @@ public class PlayerController : MonoBehaviourPun {
 
     private int CalculateDamage(string word, WordRelation relation) {
         int baseDamage = this.gameManager.CalculateDamage(word);
-        int opponentDamage = this.gameManager.CalculateDamage(this.opponent.LastSubmittedString);
+        int opponentDamage = this.gameManager.CalculateDamage(this.Opponent.LastSubmittedString);
         int damage = relation switch {
             WordRelation.Synonym => baseDamage * 2,
             WordRelation.Antonym => opponentDamage * 2,

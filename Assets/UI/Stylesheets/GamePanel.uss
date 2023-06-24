@@ -94,6 +94,7 @@
     padding-bottom: 32px;
     align-items: stretch;
     justify-content: center;
+    height: 100%;
 }
 
 #InstructionLabel {

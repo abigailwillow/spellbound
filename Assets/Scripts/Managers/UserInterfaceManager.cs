@@ -36,11 +36,11 @@ public class UserInterfaceManager : MonoBehaviour {
             this.SetPlayerPanelActive(true, player.PlayerType);
             this.UpdatePlayerHealth(player, player.Health);
             this.UpdatePlayerInput(player, player.InputText);
-            this.UpdatePlayerHistory(player, string.Empty);
+            this.WordSubmitted(player, string.Empty, WordRelation.None);
 
             player.HealthUpdated += UpdatePlayerHealth;
             player.InputTextUpdated += UpdatePlayerInput;
-            player.InputSubmitted += UpdatePlayerHistory;
+            player.WordSubmitted += WordSubmitted;
             player.NameUpdated += UpdatePlayerName;
             this.UpdatePlayerName(player, player.photonView.Owner.NickName);
 
@@ -87,9 +87,10 @@ public class UserInterfaceManager : MonoBehaviour {
     /// <param name="enabled">Whether to enable or disable the panel</param>
     /// <param name="playerType">Which player's panel to enable or disable</param>
     public void SetPlayerPanelActive(bool enabled, PlayerType playerType) {
+        bool remotePlayerPresent = enabled && playerType == PlayerType.Remote;
         PlayerElements playerElements = this.GetPlayerElements(playerType);
         playerElements.Panel.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
-        this.instructionPanel.style.display = (enabled && playerType == PlayerType.Remote) ? DisplayStyle.None : DisplayStyle.Flex;
+        this.instructionPanel.style.width = remotePlayerPresent ? Length.Percent(100) : Length.Percent(50);
     }
 
     public void SetInstruction(Action callback, params string[] strings) {
@@ -115,10 +116,23 @@ public class UserInterfaceManager : MonoBehaviour {
         playerElements.InputText.text = text;
     }
 
-    private void UpdatePlayerHistory(PlayerController player, string word) {
+    private void WordSubmitted(PlayerController player, string word, WordRelation relation) {
         PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
         playerElements.InputHistory.text = string.Empty;
         Enumerable.Reverse(player.SubmittedStrings).Take(5).ToList().ForEach(word => playerElements.InputHistory.text += $"{word}\n");
+
+        if (this.gameManager.GameState != GameState.Playing) return;
+        int baseDamage = this.gameManager.CalculateDamage(word);
+        int opponentDamage = this.gameManager.CalculateDamage(player.Opponent.LastSubmittedString);
+        string damageText = relation == WordRelation.None ? string.Empty : $"{relation.ToString().ToUpper()}! ";
+        damageText += relation switch {
+            WordRelation.Synonym => $"{baseDamage*2} HEALED (×2)",
+            WordRelation.Antonym => $"{opponentDamage*2} DAMAGE (×2)",
+            WordRelation.Related => $"{baseDamage*2} DAMAGE (×2)",
+            _ => $"{baseDamage} DAMAGE",
+
+        };
+        this.SetInstruction(damageText, "");
     }
 
     private void UpdatePlayerName(PlayerController player, string name) {
