@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         if (this.GameState == GameState.Connecting) {
             PhotonNetwork.JoinRandomRoom();
         } else if (this.GameState == GameState.PostGame) {
-            PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsVisible = false });
+            PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsOpen = false });
             string loser = this.winner == PlayerType.Local ? "your opponent" : "you";
             string result = this.winner == PlayerType.Local ? "WON" : "LOST";
 
@@ -103,7 +103,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
             this.uiManager.SetInstruction($"You {result} because {loser} {reason}", () => this.SetGameState(GameState.Menu));
         } else {
-            PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsVisible = false });
+            PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsOpen = false });
             this.SetGameState(GameState.Menu);
         }
     }
@@ -133,7 +133,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     public override void OnJoinRandomFailed(short returnCode, string message) {
         Debug.Log($"Could not join a random room ({message}), creating a new room");
-        PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = (byte)this.MAX_PLAYERS, IsVisible = true });
+        PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = (byte)this.MAX_PLAYERS, IsOpen = true });
     }
 
     public bool AddPlayer(PlayerController player) {
