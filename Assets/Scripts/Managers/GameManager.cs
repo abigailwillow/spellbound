@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private WinReason winReason = WinReason.None;
     [SerializeField] private int maxTurnTime = 30;
     public float TurnStarted { get; private set; } = 0;
+    private bool turnSkipped = false;
 
     # region Events
     /// <summary>
@@ -90,6 +91,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
         if (this.GameState == GameState.Playing && Time.time > this.TurnStarted + this.maxTurnTime) {
             this.NextTurn();
             this.uiManager.SetInstruction("Turn skipped, timer ran out", "");
+            if (this.turnSkipped) {
+                this.SetPostGame(PlayerType.None, WinReason.Time);
+            } else {
+                this.turnSkipped = true;
+            }
         }
     }
 
@@ -128,6 +134,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public override void OnLeftRoom() {
         this.Players.Clear();
         this.turnCount = -1;
+        this.turnSkipped = false;
         if (this.GameState == GameState.Playing) this.SetPostGame(PlayerType.Remote, WinReason.Disconnect);
     }
 
