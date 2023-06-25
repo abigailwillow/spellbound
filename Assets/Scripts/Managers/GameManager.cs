@@ -201,6 +201,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                                 PlayerPrefs.SetInt("SpriteIndex", index);
 
                                 this.uiManager.SetInstruction($"Your sprite is now {input}", () => this.SetMenuState(MenuState.Menu));
+                                this.uiManager.ToggleCharacterPreview(false);
 
                                 Debug.Log($"Player {player.photonView.ViewID} changed their sprite to sprite {index}");
                             } else {
@@ -266,6 +267,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 break;
             case MenuState.Sprite:
                 this.uiManager.SetInstruction($"Please choose your desired sprite");
+                this.uiManager.ToggleCharacterPreview(true);
                 break;
             case MenuState.Tutorial:
                 this.uiManager.SetInstruction(

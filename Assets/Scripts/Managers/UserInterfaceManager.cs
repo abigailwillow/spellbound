@@ -8,6 +8,7 @@ public class UserInterfaceManager : MonoBehaviour {
     private List<PlayerElements> playerElementsList = new List<PlayerElements>(2);
     private VisualElement instructionPanel;
     private Label instructionLabel;
+    private VisualElement[] spritePanels = new VisualElement[2];
     private GameManager gameManager => GameManager.Instance;
     [SerializeField, Range(0f, 1f)] private float instructionDelay = 0.05f;
     [SerializeField, Range(0f, 1f)] private float instructionStartDelay = 0.25f;
@@ -23,6 +24,9 @@ public class UserInterfaceManager : MonoBehaviour {
 
         this.instructionPanel = root.Query<VisualElement>("InstructionPanel");
         this.instructionLabel = this.instructionPanel.Query<Label>("InstructionLabel");
+
+        this.spritePanels[0] = instructionPanel.Query<VisualElement>("SpritesF");
+        this.spritePanels[1] = instructionPanel.Query<VisualElement>("SpritesM");
 
         this.SetPlayerPanelActive(false, PlayerType.Local);
         this.SetPlayerPanelActive(false, PlayerType.Remote);
@@ -145,6 +149,11 @@ public class UserInterfaceManager : MonoBehaviour {
     private void TurnIncremented(PlayerController previousPlayer, PlayerController currentPlayer, int turn) {
         this.GetPlayerElements(previousPlayer.PlayerType).Username.text = previousPlayer.photonView.Owner.NickName;
         this.GetPlayerElements(currentPlayer.PlayerType).Username.text = $">{currentPlayer.photonView.Owner.NickName}<";
+    }
+
+    public void ToggleCharacterPreview(bool enabled) {
+        this.spritePanels[0].style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
+        this.spritePanels[1].style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
     private class PlayerElements {
