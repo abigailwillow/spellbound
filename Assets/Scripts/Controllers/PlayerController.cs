@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviourPun {
     private WordDataList wordList => this.gameManager.WordList;
     private InputController input;
     private string exit = "EXIT";
+    [SerializeField] private Sprite[] sprites;
+    private SpriteRenderer spriteRenderer;
 
 
     # region Events
@@ -47,6 +49,9 @@ public class PlayerController : MonoBehaviourPun {
     private void Start() {
         this.TryGetComponent<InputController>(out input);
         this.gameManager.AddPlayer(this);
+
+        this.spriteRenderer = this.GetComponent<SpriteRenderer>();
+        this.SetSprite(PlayerPrefs.GetInt("SpriteIndex", 0));
     }
     
     public void TextInput(string character) {
@@ -170,5 +175,10 @@ public class PlayerController : MonoBehaviourPun {
             _ => baseDamage
         };
         return damage;
+    }
+
+    public void SetSprite(int index) {
+        this.spriteRenderer.sprite = this.sprites[index];
+        PlayerPrefs.SetInt("SpriteIndex", index);
     }
 }

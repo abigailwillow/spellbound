@@ -99,6 +99,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  sprites:
+  - {fileID: 21300000, guid: d90a0031ff90f7c4f9535116683c0494, type: 3}
+  - {fileID: 21300000, guid: 8a3182700b9500c478eab011ee567b4c, type: 3}
+  - {fileID: 21300000, guid: b2e3fb4d030ba714798baca84a758e27, type: 3}
+  - {fileID: 21300000, guid: 3f112b9354f0a7141a7336674cb9474e, type: 3}
+  - {fileID: 21300000, guid: d6822fc729aa61843bd24ef17d0e3dc3, type: 3}
+  - {fileID: 21300000, guid: 775db69bbad6ec04a8a41ee42ebaae88, type: 3}
 --- !u!114 &75892096413606024
 MonoBehaviour:
   m_ObjectHideFlags: 0
