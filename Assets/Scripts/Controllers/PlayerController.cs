@@ -22,6 +22,15 @@ public class PlayerController : MonoBehaviourPun {
     public Sprite[] Sprites => this.sprites;
     private SpriteRenderer spriteRenderer;
 
+    private int spriteIndex;
+    public int SpriteIndex {
+        get => spriteIndex;
+        set {
+            this.spriteIndex = value;
+            this.GetComponent<SpriteRenderer>().sprite = this.sprites[value];
+            SyncSpriteIndex();
+        }
+    }
 
     # region Events
     /// <summary>
@@ -48,12 +57,17 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     private void Start() {
+        if (PlayerType == PlayerType.Local) {
+            this.SpriteIndex = PlayerPrefs.GetInt("SpriteIndex", 0);
+		}
+
         this.TryGetComponent<InputController>(out input);
         this.gameManager.AddPlayer(this);
-
-        this.spriteRenderer = this.GetComponent<SpriteRenderer>();
-        this.SetSprite(PlayerPrefs.GetInt("SpriteIndex", 0));
     }
+
+    public void SyncSpriteIndex() => this.photonView.RPC(nameof(SyncSprite), RpcTarget.OthersBuffered, this.SpriteIndex);
+
+    [PunRPC] private void SyncSprite(int spriteIndex) => this.SpriteIndex = spriteIndex;
     
     public void TextInput(string character) {
         if (!this.input.enabled && character != this.exit.ElementAtOrDefault(this.InputText.Length).ToString()) return;
@@ -176,10 +190,5 @@ public class PlayerController : MonoBehaviourPun {
             _ => baseDamage
         };
         return damage;
-    }
-
-    public void SetSprite(int index) {
-        this.spriteRenderer.sprite = this.sprites[index];
-        PlayerPrefs.SetInt("SpriteIndex", index);
     }
 }

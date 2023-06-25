@@ -197,7 +197,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
                             int maxSprites = this.LocalPlayer.Sprites.Length;
                             if (Char.TryParse(input, out char spriteChar) && spriteChar >= 'A' && spriteChar <= 'A' + maxSprites) {
                                 int index = spriteChar - 'A';
-                                this.LocalPlayer.SetSprite(index);
+                                this.LocalPlayer.SpriteIndex = index;
+                                PlayerPrefs.SetInt("SpriteIndex", index);
+
                                 this.uiManager.SetInstruction($"Your sprite is now {input}", () => this.SetMenuState(MenuState.Menu));
 
                                 Debug.Log($"Player {player.photonView.ViewID} changed their sprite to sprite {index}");
