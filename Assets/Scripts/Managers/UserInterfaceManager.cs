@@ -91,6 +91,7 @@ public class UserInterfaceManager : MonoBehaviour {
         PlayerElements playerElements = this.GetPlayerElements(playerType);
         playerElements.Panel.style.display = enabled ? DisplayStyle.Flex : DisplayStyle.None;
         this.instructionPanel.style.width = remotePlayerPresent ? Length.Percent(100) : Length.Percent(50);
+        if (remotePlayerPresent) this.SetInstruction("");
     }
 
     public void SetInstruction(Action callback, params string[] strings) {
@@ -135,16 +136,11 @@ public class UserInterfaceManager : MonoBehaviour {
         this.SetInstruction(damageText, "");
     }
 
-    private void UpdatePlayerName(PlayerController player, string name) {
-        PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
-        playerElements.Username.text = name;
-    }
+    private void UpdatePlayerName(PlayerController player, string name) => this.GetPlayerElements(player.PlayerType).Username.text = name;
 
     private PlayerElements GetPlayerElements(PlayerType playerType) => this.playerElementsList.Find(playerElements => playerElements.PlayerType == playerType);
 
-    private void GameStateChanged(GameState gameState) {
-        this.GetPlayerElements(PlayerType.Local).HealthBar.visible = gameState == GameState.Playing;
-    }
+    private void GameStateChanged(GameState gameState) => this.GetPlayerElements(PlayerType.Local).HealthBar.visible = gameState == GameState.Playing;
 
     private void TurnIncremented(PlayerController previousPlayer, PlayerController currentPlayer, int turn) {
         this.GetPlayerElements(previousPlayer.PlayerType).Username.text = previousPlayer.photonView.Owner.NickName;
