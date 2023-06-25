@@ -26,9 +26,10 @@ public class PlayerController : MonoBehaviourPun {
     public int SpriteIndex {
         get => spriteIndex;
         set {
+            if (spriteIndex == value) return;
             this.spriteIndex = value;
             this.GetComponent<SpriteRenderer>().sprite = this.sprites[value];
-            SyncSpriteIndex();
+            this.SyncSpriteIndex();
         }
     }
 
