@@ -26,6 +26,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private float connectingMessageStartTime = 0f;
     private PlayerType winner = PlayerType.None;
     private WinReason winReason = WinReason.None;
+    [SerializeField] private int maxTurnTime = 30;
+    public float TurnStarted { get; private set; } = 0;
 
     # region Events
     /// <summary>
@@ -83,6 +85,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 this.connectingMessageStartTime = this.connectingMessageDelay + Time.time;
                 this.uiManager.SetInstruction(this.connectingMesages[UnityEngine.Random.Range(0, this.connectingMesages.Length)]);
             }
+        }
+
+        if (this.GameState == GameState.Playing && Time.time > this.TurnStarted + this.maxTurnTime) {
+            this.NextTurn();
+            this.uiManager.SetInstruction("Turn skipped, timer ran out", "");
         }
     }
 
@@ -231,6 +238,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public void NextTurn() {
         if (this.GameState != GameState.Playing) return;
         this.turnCount++;
+        this.TurnStarted = Time.time;
         PlayerController lastPlayer = this.turnCount > 0 ? this.Players[(this.turnCount - 1) % this.MAX_PLAYERS] : this.Players[1];
         PlayerController currentPlayer = this.turnCount > 0 ? this.Players[this.turnCount % this.MAX_PLAYERS] : this.Players[0];
         lastPlayer.EndTurn();

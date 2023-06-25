@@ -9,6 +9,7 @@ public class UserInterfaceManager : MonoBehaviour {
     private VisualElement instructionPanel;
     private Label instructionLabel;
     private VisualElement[] spritePanels = new VisualElement[2];
+    private Label timerLabel;
     private GameManager gameManager => GameManager.Instance;
     [SerializeField, Range(0f, 1f)] private float instructionDelay = 0.05f;
     [SerializeField, Range(0f, 1f)] private float instructionStartDelay = 0.25f;
@@ -27,6 +28,8 @@ public class UserInterfaceManager : MonoBehaviour {
 
         this.spritePanels[0] = instructionPanel.Query<VisualElement>("SpritesF");
         this.spritePanels[1] = instructionPanel.Query<VisualElement>("SpritesM");
+
+        this.timerLabel = root.Query<Label>("TimerLabel");
 
         this.SetPlayerPanelActive(false, PlayerType.Local);
         this.SetPlayerPanelActive(false, PlayerType.Remote);
@@ -83,6 +86,8 @@ public class UserInterfaceManager : MonoBehaviour {
                 this.instructionLabel.text = this.instructions[0].Substring(0, position);
             }
         }
+
+        this.timerLabel.text = $"{(this.gameManager.TurnStarted - Time.time) + 30:0.0}";
     }
 
     /// <summary>
@@ -144,7 +149,11 @@ public class UserInterfaceManager : MonoBehaviour {
 
     private PlayerElements GetPlayerElements(PlayerType playerType) => this.playerElementsList.Find(playerElements => playerElements.PlayerType == playerType);
 
-    private void GameStateChanged(GameState gameState) => this.GetPlayerElements(PlayerType.Local).HealthBar.visible = gameState == GameState.Playing;
+    private void GameStateChanged(GameState gameState) {
+        bool isPlaying = gameState == GameState.Playing;
+        this.GetPlayerElements(PlayerType.Local).HealthBar.visible = isPlaying;
+        this.timerLabel.visible = isPlaying;
+    }
 
     private void TurnIncremented(PlayerController previousPlayer, PlayerController currentPlayer, int turn) {
         this.GetPlayerElements(previousPlayer.PlayerType).Username.text = previousPlayer.photonView.Owner.NickName;

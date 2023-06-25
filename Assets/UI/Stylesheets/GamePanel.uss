@@ -81,10 +81,6 @@
     flex-direction: row;
 }
 
-.sprite-preview {
-    justify-content: center;
-}
-
 .sprite {
     width: 256px;
     height: 256px;
@@ -95,6 +91,9 @@
     -unity-font: url('project://database/Assets/Fonts/DotGothic16-Regular.ttf?fileID=12800000&guid=f168a3f0b1e417c44b4fedcd1c1858ad&type=3#DotGothic16-Regular');
     font-size: 48px;
     -unity-text-align: upper-center;
+}
+
+.sprite-preview {
 }
 
 #VersionLabel {
@@ -126,5 +125,12 @@
     white-space: normal;
 }
 
-.sprite-preview {
+#TimerLabel {
+    -unity-font-definition: initial;
+    -unity-font: url('project://database/Assets/Fonts/DotGothic16-Regular.ttf?fileID=12800000&guid=f168a3f0b1e417c44b4fedcd1c1858ad&type=3#DotGothic16-Regular');
+    font-size: 64px;
+    position: absolute;
+    left: 50%;
+    -unity-text-align: upper-center;
+    translate: -50% 0;
 }
