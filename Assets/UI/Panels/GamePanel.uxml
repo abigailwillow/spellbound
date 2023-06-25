@@ -21,7 +21,35 @@
         <ui:Label display-tooltip-when-elided="true" name="InputHistory" class="history-label" style="padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px; -unity-text-align: lower-center;" />
     </ui:VisualElement>
     <ui:VisualElement name="InstructionPanel" style="position: absolute; right: 0;">
+        <ui:VisualElement name="SpritesF" class="sprite-row" style="background-color: rgba(0, 0, 0, 0); visibility: visible; display: none;">
+            <ui:VisualElement name="SpriteA" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Witch1.png?fileID=21300000&amp;guid=d90a0031ff90f7c4f9535116683c0494&amp;type=3#Witch1&apos;);" />
+                <ui:Label tabindex="-1" text="A" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+            </ui:VisualElement>
+            <ui:VisualElement name="SpriteB" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Witch2.png?fileID=21300000&amp;guid=8a3182700b9500c478eab011ee567b4c&amp;type=3#Witch2&apos;);" />
+                <ui:Label tabindex="-1" text="B" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+            </ui:VisualElement>
+            <ui:VisualElement name="SpriteC" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Witch3.png?fileID=21300000&amp;guid=b2e3fb4d030ba714798baca84a758e27&amp;type=3#Witch3&apos;);" />
+                <ui:Label tabindex="-1" text="C" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:Label display-tooltip-when-elided="true" name="InstructionLabel" />
+        <ui:VisualElement name="SpritesM" class="sprite-row" style="background-color: rgba(0, 0, 0, 0); display: none;">
+            <ui:VisualElement name="SpriteD" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Wizard1.png?fileID=21300000&amp;guid=3f112b9354f0a7141a7336674cb9474e&amp;type=3#Wizard1&apos;);" />
+                <ui:Label tabindex="-1" text="D" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+            </ui:VisualElement>
+            <ui:VisualElement name="SpriteB" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Wizard2.png?fileID=21300000&amp;guid=d6822fc729aa61843bd24ef17d0e3dc3&amp;type=3#Wizard2&apos;);" />
+                <ui:Label tabindex="-1" text="E" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+            </ui:VisualElement>
+            <ui:VisualElement name="SpriteC" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Wizard3.png?fileID=21300000&amp;guid=775db69bbad6ec04a8a41ee42ebaae88&amp;type=3#Wizard3&apos;);" />
+                <ui:Label tabindex="-1" text="F" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+            </ui:VisualElement>
+        </ui:VisualElement>
     </ui:VisualElement>
     <ui:Label text="Version " display-tooltip-when-elided="true" name="VersionLabel" />
 </ui:UXML>
