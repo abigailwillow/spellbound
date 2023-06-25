@@ -182,6 +182,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
                     case "tutorial":
                         this.SetMenuState(MenuState.Tutorial);
                         break;
+                    case "sprite":
+                        this.SetMenuState(MenuState.Sprite);
+                        break;
                     default:
                         if (this.menuState == MenuState.Name) {
                             PhotonNetwork.LocalPlayer.NickName = input;
@@ -189,7 +192,19 @@ public class GameManager : MonoBehaviourPunCallbacks {
                             PlayerPrefs.SetString("Nickname", input);
                             this.uiManager.SetInstruction($"Your name is now {input.ToUpper()}", () => this.SetMenuState(MenuState.Menu));
 
-                            Debug.Log($"Player {player.photonView.ViewID} is now known as {input}");
+                            Debug.Log($"Player {player.photonView.ViewID} changed their name to {input}");
+                        } else if (this.menuState == MenuState.Sprite) {
+                            int maxSprites = this.LocalPlayer.Sprites.Length;
+                            if (Char.TryParse(input, out char spriteChar) && spriteChar >= 'A' && spriteChar <= 'A' + maxSprites) {
+                                int index = spriteChar - 'A';
+                                this.LocalPlayer.SetSprite(index);
+                                this.uiManager.SetInstruction($"Your sprite is now {input}", () => this.SetMenuState(MenuState.Menu));
+
+                                Debug.Log($"Player {player.photonView.ViewID} changed their sprite to sprite {index}");
+                            } else {
+                                this.uiManager.SetInstruction($"Invalid sprite {input}", () => this.SetMenuState(MenuState.Sprite));
+                                break;
+                            }
                         } else {
                             this.uiManager.SetInstruction($"Invalid command {input}", () => this.SetMenuState(MenuState.Menu));
                         }
@@ -233,34 +248,22 @@ public class GameManager : MonoBehaviourPunCallbacks {
         this.GameState = gameState;
         this.GameStateChanged?.Invoke(gameState);
 
+        if (gameState == GameState.Menu) this.SetMenuState(MenuState.Menu);
+
         Debug.Log($"Game State changed to {gameState}");
-
-        if (this.menuState == MenuState.Tutorial) return;
-
-        switch (gameState) {
-            case GameState.Menu:
-                this.uiManager.SetInstruction("Type START to start the game\nType NAME to change your name\nType TUTORIAL to play the tutorial");
-                break;
-            case GameState.Connecting:
-                this.uiManager.SetInstruction("Connecting...");
-                break;
-            case GameState.Playing:
-                this.uiManager.SetInstruction("");
-                break;
-            case GameState.PostGame:
-                this.uiManager.SetInstruction("Lost connection to the server");
-                break;
-        }
     }
 
     private void SetMenuState(MenuState menuState) {
         this.menuState = menuState;
         switch (menuState) {
+            case MenuState.Menu:
+                this.uiManager.SetInstruction("Type START to start the game\nType NAME to change your name\nType SPRITE to change your sprite\nType TUTORIAL to play the tutorial");
+                break;
             case MenuState.Name:
                 this.uiManager.SetInstruction("Please enter your name");
                 break;
-            case MenuState.Menu:
-                this.uiManager.SetInstruction("Type START to start the game\nType NAME to change your name\nType TUTORIAL to play the tutorial");
+            case MenuState.Sprite:
+                this.uiManager.SetInstruction($"Please choose your desired sprite");
                 break;
             case MenuState.Tutorial:
                 this.uiManager.SetInstruction(

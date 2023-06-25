@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviourPun {
     private InputController input;
     private string exit = "EXIT";
     [SerializeField] private Sprite[] sprites;
+    public Sprite[] Sprites => this.sprites;
     private SpriteRenderer spriteRenderer;
 
 

@@ -27,6 +27,7 @@ public enum MenuState {
     None,
     Menu,
     Name,
+    Sprite,
     Tutorial
 }
 
