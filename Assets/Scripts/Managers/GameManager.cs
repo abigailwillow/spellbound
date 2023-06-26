@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public WordDataList WordList { get; private set; }
     public readonly int MAX_PLAYERS = 2;
     public GameState GameState { get; private set; } = GameState.None;
+    private MenuState menuState = MenuState.None;
     [Header("Prefabs")]
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private GameObject userInterfacePrefab;
@@ -20,7 +21,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
     [SerializeField] private LetterValues letterValues;
     private UserInterfaceManager uiManager;
     private int turnCount = -1;
-    private MenuState menuState = MenuState.None;
     private string[] connectingMesages = new string[] { "Connecting...", "Finding opponent...", "Still looking...", "Almost there...", "You can type CANCEL to return..." };
     private float connectingMessageDelay = 10f;
     private float connectingMessageStartTime = 0f;
@@ -75,12 +75,14 @@ public class GameManager : MonoBehaviourPunCallbacks {
     }
 
     private void Update() {
+        // Position players
         float cameraHalfWidth = (Camera.main.orthographicSize * Camera.main.aspect) / 2;
         this.Players.ForEach(player => {
             if (!player) return;
             player.transform.position = new Vector3(cameraHalfWidth * (player.PlayerType == PlayerType.Local ? -1 : 1), 0, 0);
         });
 
+        // Show randomized connecting messages
         if (this.GameState == GameState.Connecting) {
             if (this.connectingMessageStartTime <= Time.time) {
                 this.connectingMessageStartTime = this.connectingMessageDelay + Time.time;
@@ -88,13 +90,14 @@ public class GameManager : MonoBehaviourPunCallbacks {
             }
         }
 
+        // Check if in game and the turn timer has run out
         if (this.GameState == GameState.Playing && Time.time > this.TurnStarted + this.maxTurnTime) {
-            this.NextTurn();
-            this.uiManager.SetInstruction("Turn skipped, timer ran out", "");
-            if (this.turnSkipped) {
-                this.SetPostGame(PlayerType.None, WinReason.Time);
-            } else {
+            if (!this.turnSkipped) {
                 this.turnSkipped = true;
+                this.NextTurn();
+                this.uiManager.SetInstruction("Turn skipped, timer ran out", "");
+            } else {
+                this.SetPostGame(PlayerType.None, WinReason.Time);
             }
         }
     }
@@ -300,6 +303,11 @@ public class GameManager : MonoBehaviourPunCallbacks {
         Debug.Log($"Menu State changed to {menuState}");
     }
 
+    /// <summary>
+    /// Sets the game state to post game, sets the winner and win reason, and leaves the room
+    /// </summary>
+    /// <param name="winner">Whether the local or remote player won</param>
+    /// <param name="winReason">The reason why that player won</param>
     public void SetPostGame(PlayerType winner, WinReason winReason) {
         this.winner = winner;
         this.winReason = winReason;

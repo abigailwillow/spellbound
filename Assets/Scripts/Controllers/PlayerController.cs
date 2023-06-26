@@ -8,6 +8,8 @@ using Photon.Pun;
 public class PlayerController : MonoBehaviourPun {
     [SerializeField] private int maxHealth = 100;
     public int MaxHealth => this.maxHealth;
+    [SerializeField] private Sprite[] sprites;
+    public Sprite[] Sprites => this.sprites;
     public int Health { get; private set; }
     public PlayerType PlayerType => this.photonView.IsMine ? PlayerType.Local : PlayerType.Remote;
     public string InputText { get; private set; } = string.Empty;
@@ -18,10 +20,7 @@ public class PlayerController : MonoBehaviourPun {
     private WordDataList wordList => this.gameManager.WordList;
     private InputController input;
     private string exit = "EXIT";
-    [SerializeField] private Sprite[] sprites;
-    public Sprite[] Sprites => this.sprites;
     private SpriteRenderer spriteRenderer;
-
     private int spriteIndex;
     public int SpriteIndex {
         get => spriteIndex;
@@ -159,6 +158,8 @@ public class PlayerController : MonoBehaviourPun {
 
     public void EndTurn() {
         if (this.input) this.input.enabled = false;
+        this.InputText = string.Empty;
+        this.InputTextUpdated?.Invoke(this, this.InputText);
         Debug.Log($"[{this.PlayerType}] Turn Ended");
     }
 
