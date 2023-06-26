@@ -7,13 +7,25 @@ using Photon.Pun;
 [RequireComponent(typeof(PhotonView))]
 public class PlayerController : MonoBehaviourPun {
     [SerializeField] private int maxHealth = 100;
+    /// <summary>
+    /// The player's maximum health
+    /// </summary>
     public int MaxHealth => this.maxHealth;
     [SerializeField] private Sprite[] sprites;
     public Sprite[] Sprites => this.sprites;
+    /// <summary>
+    /// The player's current health
+    /// </summary>
     public int Health { get; private set; }
     public PlayerType PlayerType => this.photonView.IsMine ? PlayerType.Local : PlayerType.Remote;
     public string InputText { get; private set; } = string.Empty;
+    /// <summary>
+    /// List of all submitted strings in the current session
+    /// </summary>
     public List<string> SubmittedStrings { get; private set; } = new List<string>();
+    /// <summary>
+    /// The last submitted string in the current session, if none then empty string
+    /// </summary>
     public string LastSubmittedString => this.SubmittedStrings.Count > 0 ? this.SubmittedStrings[this.SubmittedStrings.Count - 1] : string.Empty;
     public PlayerController Opponent => this.PlayerType == PlayerType.Local ? gameManager.RemotePlayer : gameManager.LocalPlayer;
     private GameManager gameManager => GameManager.Instance;
@@ -22,6 +34,10 @@ public class PlayerController : MonoBehaviourPun {
     private string exit = "EXIT";
     private SpriteRenderer spriteRenderer;
     private int spriteIndex;
+    /// <summary>
+    /// The index of the sprite to use, automatically sets and syncs the sprite
+    /// </summary>
+    /// <value></value>
     public int SpriteIndex {
         get => spriteIndex;
         set {
@@ -59,16 +75,23 @@ public class PlayerController : MonoBehaviourPun {
     private void Start() {
         if (PlayerType == PlayerType.Local) {
             this.SpriteIndex = PlayerPrefs.GetInt("SpriteIndex", 0);
-		}
+        }
 
         this.TryGetComponent<InputController>(out input);
         this.gameManager.AddPlayer(this);
     }
 
+    /// <summary>
+    /// Synchronizes the player sprite's index with the remote player, ensuring it will get received
+    /// </summary>
     public void SyncSpriteIndex() => this.photonView.RPC(nameof(SyncSprite), RpcTarget.OthersBuffered, this.SpriteIndex);
 
     [PunRPC] private void SyncSprite(int spriteIndex) => this.SpriteIndex = spriteIndex;
-    
+
+    /// <summary>
+    /// Adds a character to the player's input text, if the input is disabled it will only accept exit characters
+    /// </summary>
+    /// <param name="character">The character to append</param>
     public void TextInput(string character) {
         if (!this.input.enabled && character != this.exit.ElementAtOrDefault(this.InputText.Length).ToString()) return;
         this.photonView.RPC(nameof(RPCTextInput), RpcTarget.All, character);
@@ -77,9 +100,13 @@ public class PlayerController : MonoBehaviourPun {
     [PunRPC] public void RPCTextInput(string character) {
         this.InputText += character;
         this.InputTextUpdated?.Invoke(this, this.InputText);
+
         Debug.Log($"[{this.PlayerType}] TextInput -> {character} ({this.InputText})");
     }
 
+    /// <summary>
+    /// Removes the last character from the player's input text, if there is a character to remove
+    /// </summary>
     public void Backspace() => this.photonView.RPC(nameof(RPCBackspace), RpcTarget.All);
 
     [PunRPC] public void RPCBackspace() {
@@ -91,8 +118,15 @@ public class PlayerController : MonoBehaviourPun {
         Debug.Log($"[{this.PlayerType}] Backspace -> {this.InputText}");
     }
 
+    /// <summary>
+    /// Submits the player's current input
+    /// </summary>
     public void Submit() => this.Submit(this.InputText);
 
+    /// <summary>
+    /// Submits the given input
+    /// </summary>
+    /// <param name="input">The input to submit</param>
     public void Submit(string input) => this.photonView.RPC(nameof(RPCSubmit), RpcTarget.All, input);
 
     [PunRPC] public void RPCSubmit(string input) {
@@ -103,7 +137,7 @@ public class PlayerController : MonoBehaviourPun {
 
             WordData word = this.wordList.Get(input);
             WordRelation relation = this.GetWordRelation(input);
-            
+
             this.SubmittedStrings.Add(input);
             this.SubmitInput(input, relation);
 
