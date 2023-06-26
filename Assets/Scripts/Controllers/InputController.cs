@@ -19,18 +19,22 @@ public class InputController : MonoBehaviour {
         }
     }
 
+    private void OnDestroy() {
+        Keyboard.current.onTextInput -= OnTextInput;
+        this.Binding.SubmitAction.performed -= this.OnSubmit;
+        this.Binding.BackspaceAction.performed -= this.OnBackspace;
+    }
+
+    /// <summary>
+    /// Sets up the binding for the input controller and enables its necessary components
+    /// </summary>
+    /// <param name="binding">The bindings to use</param>
     private void SetupBinding(Binding binding) {
         this.binding = binding;
         Keyboard.current.onTextInput += OnTextInput;
         this.binding.SubmitAction.performed += this.OnSubmit;
         this.binding.BackspaceAction.performed += this.OnBackspace;
         this.binding?.OnEnable();
-    }
-
-    private void OnDestroy() {
-        Keyboard.current.onTextInput -= OnTextInput;
-        this.Binding.SubmitAction.performed -= this.OnSubmit;
-        this.Binding.BackspaceAction.performed -= this.OnBackspace;
     }
 
     public void OnTextInput(char character) {
