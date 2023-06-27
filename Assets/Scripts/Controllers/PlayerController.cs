@@ -22,18 +22,12 @@ public class PlayerController : MonoBehaviourPun {
     /// <summary>
     /// List of all submitted strings in the current session
     /// </summary>
-    public List<string> SubmittedStrings { get; private set; } = new List<string>();
-    /// <summary>
-    /// The last submitted string in the current session, if none then empty string
-    /// </summary>
-    public string LastSubmittedString => this.SubmittedStrings.Count > 0 ? this.SubmittedStrings[this.SubmittedStrings.Count - 1] : string.Empty;
+    public List<string> Submissions { get; private set; } = new List<string>();
     public PlayerController Opponent => this.PlayerType == PlayerType.Local ? gameManager.RemotePlayer : gameManager.LocalPlayer;
     private GameManager gameManager => GameManager.Instance;
-    private WordDataList wordList => this.gameManager.WordList;
     private InputController input;
-    private string exit = "EXIT";
-    private SpriteRenderer spriteRenderer;
     private int spriteIndex;
+    private string exit = "EXIT";
     /// <summary>
     /// The index of the sprite to use, automatically sets and syncs the sprite
     /// </summary>
@@ -80,6 +74,8 @@ public class PlayerController : MonoBehaviourPun {
         this.TryGetComponent<InputController>(out input);
         this.gameManager.AddPlayer(this);
     }
+
+    private void OnDestroy() => this.gameManager.PlayerDestroyed?.Invoke(this.PlayerType);
 
     /// <summary>
     /// Synchronizes the player sprite's index with the remote player, ensuring it will get received
@@ -132,35 +128,46 @@ public class PlayerController : MonoBehaviourPun {
     [PunRPC] public void RPCSubmit(string input) {
         if (string.IsNullOrEmpty(input)) return;
         if (this.gameManager.GameState == GameState.Playing) {
-            if (!this.wordList.Contains(input) && input != this.exit) { Debug.Log($"[{this.PlayerType}] Not a valid word ({input})"); return; }
-            if (input == this.exit) { this.SubmitInput(input); return; }
+            Submission submission = new Submission(input);
 
-            WordData word = this.wordList.Get(input);
-            // WordRelation relation = this.GetWordRelation(input);
+            if (input == this.exit) { this.SubmitSubmission(submission); return; }
+            if (!submission.Valid) { Debug.Log($"[{this.PlayerType}] Not a valid word ({input})"); return; }
 
-            this.SubmittedStrings.Add(input);
-            // this.SubmitInput(input, relation);
+            this.SubmitSubmission(submission);
 
-            // int damage = this.CalculateDamage(input, relation);
-            // if (relation == WordRelation.Synonym) {
-            //     this.Heal(damage);
-            // } else {
-            //     this.Opponent.TakeDamage(damage);
-            // }
+            if (submission.Healing) {
+                this.Heal(submission.Damage);
+            } else {
+                this.Opponent.Damage(submission.Damage);
+            }
 
-            Debug.Log($"[{this.PlayerType}] Submit -> {input} (Synonyms: {string.Join(", ", word.Synonyms)} - Antonyms: {string.Join(", ", word.Antonyms)} - Related: {string.Join(", ", word.RelatedWords)})");
+            Debug.Log(
+                $"[{this.PlayerType}] Submit -> {input} (" +
+                $"Synonyms: {string.Join(", ", submission.Word.Synonyms)} - " +
+                $"Antonyms: {string.Join(", ", submission.Word.Antonyms)} - " +
+                $"Related: {string.Join(", ", submission.Word.RelatedWords)})"
+            );
         } else {
-            this.SubmitInput(input);
+            this.Submit(input);
         }
     }
 
-    private void SubmitInput(string input, WordRelation relation = WordRelation.None) {
+    /// <summary>
+    /// Submits the given submission, calls the appropriate events and adds the submission to the list of submissions if applicable
+    /// </summary>
+    /// <param name="submission">The submission to submit</param>
+    private void SubmitSubmission(Submission submission) {
         this.InputText = string.Empty;
-        this.InputTextUpdated?.Invoke(this, this.InputText);
-        this.WordSubmitted?.Invoke(this, input, relation);
+        this.InputTextUpdated?.Invoke(this, submission.Input);
+        this.WordSubmitted?.Invoke(this, submission.Input, submission.Relation);
+        if (this.gameManager.GameState == GameState.Playing) this.Submissions.Add(submission.Input);
     }
 
-    public void TakeDamage(int damage) {
+    /// <summary>
+    /// Damages the player by the given amount, if the player's health reaches zero they will die
+    /// </summary>
+    /// <param name="damage">The amount of damage to inflict</param>
+    public void Damage(int damage) {
         this.Health = Mathf.Max(0, this.Health - damage);
         if (this.Health <= 0) {
             this.Die();
@@ -170,6 +177,10 @@ public class PlayerController : MonoBehaviourPun {
         Debug.Log($"[{this.PlayerType}] Damaged -> {damage} ({this.Health}/{this.MaxHealth})");
     }
 
+    /// <summary>
+    /// Heals the player by the given amount, if the player's health exceeds their maximum health it will be set to their maximum health
+    /// </summary>
+    /// <param name="amount">The amount to heal by</param>
     public void Heal(int amount) {
         this.Health = Mathf.Min(this.MaxHealth, this.Health + amount);
         this.HealthUpdated?.Invoke(this, this.Health);
@@ -177,19 +188,26 @@ public class PlayerController : MonoBehaviourPun {
         Debug.Log($"[{this.PlayerType}] Healed -> {amount} ({this.Health}/{this.MaxHealth})");
     }
 
+    /// <summary>
+    /// Kills the player, setting the game state to post game
+    /// </summary>
     private void Die() {
         this.gameManager.SetPostGame(this.Opponent.PlayerType, WinReason.Health);
 
         Debug.Log($"[{this.PlayerType}] Died");
     }
 
-    private void OnDestroy() => this.gameManager.PlayerDestroyed?.Invoke(this.PlayerType);
-
+    /// <summary>
+    /// Starts this player's turn, enabling input
+    /// </summary>
     public void StartTurn() {
         if (this.input) this.input.enabled = true;
         Debug.Log($"[{this.PlayerType}] Turn Started");
     }
 
+    /// <summary>
+    /// Ends this player's turn, disables input, and clears the input text
+    /// </summary>
     public void EndTurn() {
         if (this.input) this.input.enabled = false;
         this.InputText = string.Empty;
@@ -197,5 +215,8 @@ public class PlayerController : MonoBehaviourPun {
         Debug.Log($"[{this.PlayerType}] Turn Ended");
     }
 
+    /// <summary>
+    /// Enable or disable the player's input
+    /// </summary>
     public void ToggleInput(bool enabled) => this.input.enabled = enabled;
 }

@@ -129,7 +129,7 @@ public class UserInterfaceManager : MonoBehaviour {
     private void WordSubmitted(PlayerController player, string word, WordRelation relation) {
         PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
         playerElements.InputHistory.text = string.Empty;
-        Enumerable.Reverse(player.SubmittedStrings).Take(5).ToList().ForEach(word => playerElements.InputHistory.text += $"{word}\n");
+        Enumerable.Reverse(player.Submissions).Take(5).ToList().ForEach(word => playerElements.InputHistory.text += $"{word}\n");
 
         if (this.gameManager.GameState != GameState.Playing) return;
         // int baseDamage = this.gameManager.CalculateBaseDamage(word);

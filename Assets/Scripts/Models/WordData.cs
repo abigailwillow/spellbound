@@ -65,7 +65,7 @@ using UnityEngine;
     /// Get the relation of this word to the given word
     /// </summary>
     /// <param name="word">The word to check the relation against</param>
-    public WordRelation GetWordRelation(string word) {
+    public WordRelation GetRelation(string word) {
         return word switch {
             _ when this.IsSynonym(word) => WordRelation.Synonym,
             _ when this.IsAntonym(word) => WordRelation.Antonym,

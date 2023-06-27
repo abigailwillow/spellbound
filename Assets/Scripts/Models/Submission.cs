@@ -20,20 +20,23 @@ public class Submission {
     /// <summary>
     /// The damage that should be dealt to the player
     /// </summary>
-    /// <remarks>Null if the submission was invalid</remarks>
-    public int? Damage { get; private set; }
+    /// <remarks>Zero if the submission was invalid</remarks>
+    public int Damage { get; private set; }
     /// <summary>
     /// Whether or not the damage of this word should be healed instead
     /// </summary>
-    /// <remarks>Null if the submission was invalid</remarks>
-    public bool? Healing { get; private set; }
+    /// <remarks>False if the submission was invalid</remarks>
+    public bool Healing { get; private set; }
     private GameManager gameManager;
 
-    public Submission(string input, string lastInput) {
+    public Submission(string input) {
         this.gameManager = GameManager.Instance;
         this.Input = input;
-        this.Relation = this.GetWordRelation(input);
+        this.Word = this.gameManager.WordList.Get(input);
+        this.Relation = this.Word.GetRelation(Submission.PreviousSubmission?.Input);
         this.Damage = this.CalculateDamage(input, this.Relation);
+        this.Healing = this.Relation == WordRelation.Synonym;
+        PreviousSubmission = this;
     }
 
     /// <summary>
@@ -43,7 +46,7 @@ public class Submission {
     /// <returns>The relation of the current input to the most previous submission</returns>
     private WordRelation GetWordRelation(string input) {
         WordData previousWord = this.gameManager.WordList.Get(Submission.PreviousSubmission?.Input);
-        return previousWord != null ? previousWord.GetWordRelation(input) : WordRelation.None;
+        return previousWord != null ? previousWord.GetRelation(input) : WordRelation.None;
     }
 
     /// <summary>
