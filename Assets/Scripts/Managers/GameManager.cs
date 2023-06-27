@@ -159,7 +159,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
             this.Players.Add(player);
             this.Players.Sort((a, b) => a.photonView.ViewID - b.photonView.ViewID);
             this.PlayerInstantiated?.Invoke(player);
-            player.WordSubmitted += this.InputSubmitted;
+            player.Submitted += this.InputSubmitted;
 
             if (this.Players.Count == MAX_PLAYERS) {
                 this.SetGameState(GameState.Playing);

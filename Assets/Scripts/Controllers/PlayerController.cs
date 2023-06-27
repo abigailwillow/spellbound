@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviourPun {
     /// <summary>
     /// List of all submitted strings in the current session
     /// </summary>
-    public List<string> Submissions { get; private set; } = new List<string>();
+    public List<Submission> Submissions { get; private set; } = new List<Submission>();
     public PlayerController Opponent => this.PlayerType == PlayerType.Local ? gameManager.RemotePlayer : gameManager.LocalPlayer;
     private GameManager gameManager => GameManager.Instance;
     private InputController input;
@@ -31,7 +31,6 @@ public class PlayerController : MonoBehaviourPun {
     /// <summary>
     /// The index of the sprite to use, automatically sets and syncs the sprite
     /// </summary>
-    /// <value></value>
     public int SpriteIndex {
         get => spriteIndex;
         set {
@@ -54,7 +53,7 @@ public class PlayerController : MonoBehaviourPun {
     /// <summary>
     /// Called when the player submits a word
     /// </summary>
-    public Action<PlayerController, string, WordRelation> WordSubmitted;
+    public Action<PlayerController, Submission> Submitted;
     public Action<PlayerController, string> NameUpdated;
     # endregion
 
@@ -159,8 +158,8 @@ public class PlayerController : MonoBehaviourPun {
     private void SubmitSubmission(Submission submission) {
         this.InputText = string.Empty;
         this.InputTextUpdated?.Invoke(this, submission.Input);
-        this.WordSubmitted?.Invoke(this, submission.Input, submission.Relation);
-        if (this.gameManager.GameState == GameState.Playing) this.Submissions.Add(submission.Input);
+        this.Submitted?.Invoke(this, submission);
+        if (this.gameManager.GameState == GameState.Playing) this.Submissions.Add(submission);
     }
 
     /// <summary>

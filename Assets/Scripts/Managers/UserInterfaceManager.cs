@@ -43,11 +43,11 @@ public class UserInterfaceManager : MonoBehaviour {
             this.SetPlayerPanelActive(true, player.PlayerType);
             this.UpdatePlayerHealth(player, player.Health);
             this.UpdatePlayerInput(player, player.InputText);
-            this.WordSubmitted(player, string.Empty, WordRelation.None);
+            this.WordSubmitted(player, new Submission(String.Empty));
 
             player.HealthUpdated += UpdatePlayerHealth;
             player.InputTextUpdated += UpdatePlayerInput;
-            player.WordSubmitted += WordSubmitted;
+            player.Submitted += WordSubmitted;
             player.NameUpdated += UpdatePlayerName;
             this.UpdatePlayerName(player, player.photonView.Owner.NickName);
 
@@ -126,23 +126,17 @@ public class UserInterfaceManager : MonoBehaviour {
         playerElements.InputText.text = text;
     }
 
-    private void WordSubmitted(PlayerController player, string word, WordRelation relation) {
+    private void WordSubmitted(PlayerController player, Submission submission) {
         PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
         playerElements.InputHistory.text = string.Empty;
-        Enumerable.Reverse(player.Submissions).Take(5).ToList().ForEach(word => playerElements.InputHistory.text += $"{word}\n");
+        Enumerable.Reverse(player.Submissions).Take(5).ToList().ForEach(submission => playerElements.InputHistory.text += $"{submission.Input}\n");
 
         if (this.gameManager.GameState != GameState.Playing) return;
-        // int baseDamage = this.gameManager.CalculateBaseDamage(word);
-        // int opponentDamage = this.gameManager.CalculateBaseDamage(player.Opponent.LastSubmittedString);
-        // string damageText = relation == WordRelation.None ? string.Empty : $"{relation.ToString().ToUpper()}! ";
-        // damageText += relation switch {
-        //     WordRelation.Synonym => $"{baseDamage*2} HEALED (×2)",
-        //     WordRelation.Antonym => $"{opponentDamage*2} DAMAGE (×2)",
-        //     WordRelation.Related => $"{baseDamage*2} DAMAGE (×2)",
-        //     _ => $"{baseDamage} DAMAGE",
-
-        // };
-        // this.SetInstruction(damageText, "");
+        string damageText = submission.Relation == WordRelation.None ? string.Empty :
+        $"{submission.Relation.ToString().ToUpper()}! {submission.Damage} ";
+        damageText += submission.Healing ? "HEALED" : "DAMAGE";
+        damageText += submission.Relation != WordRelation.None ? $" (×2)" : string.Empty;
+        this.SetInstruction(damageText, "");
     }
 
     private void UpdatePlayerName(PlayerController player, string name) => this.GetPlayerElements(player.PlayerType).Username.text = name;
