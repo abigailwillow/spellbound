@@ -171,10 +171,10 @@ public class GameManager : MonoBehaviourPunCallbacks {
         return valid;
     }
 
-    private void InputSubmitted(PlayerController player, string input, WordRelation relation) {
+    private void InputSubmitted(PlayerController player, Submission submission) {
         if (this.GameState == GameState.Menu) {
             if (this.menuState == MenuState.Tutorial) {
-                if (input.ToLower() == "spellbound") {
+                if (submission.Input.ToLower() == "spellbound") {
                     this.uiManager.SetInstruction(() => this.SetMenuState(MenuState.Name),
                         "You just cast your first spell!",
                         "That's all there is to it\nYou now know how to play Spellbound",
@@ -184,7 +184,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                     PlayerPrefs.SetInt("CompletedTutorial", 1);
                 }
             } else {
-                switch (input.ToLower()) {
+                switch (submission.Input.ToLower()) {
                     case "start":
                         if (PhotonNetwork.LocalPlayer.NickName != string.Empty) {
                             this.SetGameState(GameState.Connecting);
@@ -204,41 +204,41 @@ public class GameManager : MonoBehaviourPunCallbacks {
                         break;
                     default:
                         if (this.menuState == MenuState.Name) {
-                            PhotonNetwork.LocalPlayer.NickName = input;
-                            this.LocalPlayer.NameUpdated?.Invoke(this.LocalPlayer, input);
-                            PlayerPrefs.SetString("Nickname", input);
-                            this.uiManager.SetInstruction($"Your name is now {input.ToUpper()}", () => this.SetMenuState(MenuState.Menu));
+                            PhotonNetwork.LocalPlayer.NickName = submission.Input;
+                            this.LocalPlayer.NameUpdated?.Invoke(this.LocalPlayer, submission.Input);
+                            PlayerPrefs.SetString("Nickname", submission.Input);
+                            this.uiManager.SetInstruction($"Your name is now {submission.Input.ToUpper()}", () => this.SetMenuState(MenuState.Menu));
 
-                            Debug.Log($"Player {player.photonView.ViewID} changed their name to {input}");
+                            Debug.Log($"Player {player.photonView.ViewID} changed their name to {submission.Input}");
                         } else if (this.menuState == MenuState.Sprite) {
                             int maxSprites = this.LocalPlayer.Sprites.Length;
-                            if (Char.TryParse(input, out char spriteChar) && spriteChar >= 'A' && spriteChar <= 'A' + maxSprites) {
+                            if (Char.TryParse(submission.Input, out char spriteChar) && spriteChar >= 'A' && spriteChar <= 'A' + maxSprites) {
                                 int index = spriteChar - 'A';
                                 this.LocalPlayer.SpriteIndex = index;
                                 PlayerPrefs.SetInt("SpriteIndex", index);
 
-                                this.uiManager.SetInstruction($"Your sprite is now {input}", () => this.SetMenuState(MenuState.Menu));
+                                this.uiManager.SetInstruction($"Your sprite is now {submission.Input}", () => this.SetMenuState(MenuState.Menu));
                                 this.uiManager.ToggleCharacterPreview(false);
 
                                 Debug.Log($"Player {player.photonView.ViewID} changed their sprite to sprite {index}");
                             } else {
-                                this.uiManager.SetInstruction($"Invalid sprite {input}", () => this.SetMenuState(MenuState.Sprite));
+                                this.uiManager.SetInstruction($"Invalid sprite {submission.Input}", () => this.SetMenuState(MenuState.Sprite));
                                 break;
                             }
                         } else {
-                            this.uiManager.SetInstruction($"Invalid command {input}", () => this.SetMenuState(MenuState.Menu));
+                            this.uiManager.SetInstruction($"Invalid command {submission.Input}", () => this.SetMenuState(MenuState.Menu));
                         }
                         break;
                 }
             }
         } else if (this.GameState == GameState.Playing) {
-            if (input.ToLower() == "exit" && player.PlayerType == PlayerType.Local) {
+            if (submission.Input.ToLower() == "exit" && player.PlayerType == PlayerType.Local) {
                 this.SetPostGame(PlayerType.Remote, WinReason.Disconnect);
             } else {
                 this.NextTurn();
             }
         } else if (this.GameState == GameState.Connecting) {
-            if (input.ToLower() == "cancel") {
+            if (submission.Input.ToLower() == "cancel") {
                 this.SetGameState(GameState.Menu);
                 PhotonNetwork.LeaveRoom();
             }
