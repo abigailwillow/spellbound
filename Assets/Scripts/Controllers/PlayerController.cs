@@ -136,17 +136,17 @@ public class PlayerController : MonoBehaviourPun {
             if (input == this.exit) { this.SubmitInput(input); return; }
 
             WordData word = this.wordList.Get(input);
-            WordRelation relation = this.GetWordRelation(input);
+            // WordRelation relation = this.GetWordRelation(input);
 
             this.SubmittedStrings.Add(input);
-            this.SubmitInput(input, relation);
+            // this.SubmitInput(input, relation);
 
-            int damage = this.CalculateDamage(input, relation);
-            if (relation == WordRelation.Synonym) {
-                this.Heal(damage);
-            } else {
-                this.Opponent.TakeDamage(damage);
-            }
+            // int damage = this.CalculateDamage(input, relation);
+            // if (relation == WordRelation.Synonym) {
+            //     this.Heal(damage);
+            // } else {
+            //     this.Opponent.TakeDamage(damage);
+            // }
 
             Debug.Log($"[{this.PlayerType}] Submit -> {input} (Synonyms: {string.Join(", ", word.Synonyms)} - Antonyms: {string.Join(", ", word.Antonyms)} - Related: {string.Join(", ", word.RelatedWords)})");
         } else {
@@ -198,33 +198,4 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     public void ToggleInput(bool enabled) => this.input.enabled = enabled;
-
-    private WordRelation GetWordRelation(string word) {
-        if (this.wordList.Contains(this.Opponent.LastSubmittedString)) {
-            WordData opponentWord = this.wordList.Get(this.Opponent.LastSubmittedString);
-            WordRelation relation = word switch {
-                _ when opponentWord.IsSynonym(word) => WordRelation.Synonym,
-                _ when opponentWord.IsAntonym(word) => WordRelation.Antonym,
-                _ when opponentWord.IsRelated(word) => WordRelation.Related,
-                _ => WordRelation.None
-            };
-
-            Debug.Log($"[{this.PlayerType}] {relation.ToString().ToUpper()} -> {word}");
-
-            return relation;
-        }
-        return WordRelation.None;
-    }
-
-    private int CalculateDamage(string word, WordRelation relation) {
-        int baseDamage = this.gameManager.CalculateDamage(word);
-        int opponentDamage = this.gameManager.CalculateDamage(this.Opponent.LastSubmittedString);
-        int damage = relation switch {
-            WordRelation.Synonym => baseDamage * 2,
-            WordRelation.Antonym => opponentDamage * 2,
-            WordRelation.Related => baseDamage * 2,
-            _ => baseDamage
-        };
-        return damage;
-    }
 }

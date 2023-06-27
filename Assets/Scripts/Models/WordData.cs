@@ -60,4 +60,17 @@ using UnityEngine;
     /// Returns true if the word is related to this word
     /// </summary>
     public bool IsRelated(string word) => this.relatedWords.Exists(relatedWord => relatedWord.ToLower() == word.ToLower());
+
+    /// <summary>
+    /// Get the relation of this word to the given word
+    /// </summary>
+    /// <param name="word">The word to check the relation against</param>
+    public WordRelation GetWordRelation(string word) {
+        return word switch {
+            _ when this.IsSynonym(word) => WordRelation.Synonym,
+            _ when this.IsAntonym(word) => WordRelation.Antonym,
+            _ when this.IsRelated(word) => WordRelation.Related,
+            _ => WordRelation.None
+        };
+    }
 }

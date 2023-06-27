@@ -132,17 +132,17 @@ public class UserInterfaceManager : MonoBehaviour {
         Enumerable.Reverse(player.SubmittedStrings).Take(5).ToList().ForEach(word => playerElements.InputHistory.text += $"{word}\n");
 
         if (this.gameManager.GameState != GameState.Playing) return;
-        int baseDamage = this.gameManager.CalculateDamage(word);
-        int opponentDamage = this.gameManager.CalculateDamage(player.Opponent.LastSubmittedString);
-        string damageText = relation == WordRelation.None ? string.Empty : $"{relation.ToString().ToUpper()}! ";
-        damageText += relation switch {
-            WordRelation.Synonym => $"{baseDamage*2} HEALED (×2)",
-            WordRelation.Antonym => $"{opponentDamage*2} DAMAGE (×2)",
-            WordRelation.Related => $"{baseDamage*2} DAMAGE (×2)",
-            _ => $"{baseDamage} DAMAGE",
+        // int baseDamage = this.gameManager.CalculateBaseDamage(word);
+        // int opponentDamage = this.gameManager.CalculateBaseDamage(player.Opponent.LastSubmittedString);
+        // string damageText = relation == WordRelation.None ? string.Empty : $"{relation.ToString().ToUpper()}! ";
+        // damageText += relation switch {
+        //     WordRelation.Synonym => $"{baseDamage*2} HEALED (×2)",
+        //     WordRelation.Antonym => $"{opponentDamage*2} DAMAGE (×2)",
+        //     WordRelation.Related => $"{baseDamage*2} DAMAGE (×2)",
+        //     _ => $"{baseDamage} DAMAGE",
 
-        };
-        this.SetInstruction(damageText, "");
+        // };
+        // this.SetInstruction(damageText, "");
     }
 
     private void UpdatePlayerName(PlayerController player, string name) => this.GetPlayerElements(player.PlayerType).Username.text = name;

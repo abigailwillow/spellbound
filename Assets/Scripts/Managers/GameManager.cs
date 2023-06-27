@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     [SerializeField] private GameObject userInterfacePrefab;
     [Header("Miscellaneous")]
     [SerializeField] private Binding localPlayerBinding;
-    [SerializeField] private LetterValues letterValues;
+    public LetterValues LetterValues;
     private UserInterfaceManager uiManager;
     private int turnCount = -1;
     private string[] connectingMesages = new string[] { "Connecting...", "Finding opponent...", "Still looking...", "Almost there...", "You can type CANCEL to return..." };
@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         Debug.Log($"Valid Words: {string.Join(", ", WordList.Words.ConvertAll(word => word.Word))}");
 
         List<string> debugValues = new List<string>();
-        foreach (char letter in "abcdefghijklmnopqrstuvwxyz") debugValues.Add($"{letter}: {this.letterValues.GetValue(letter)}");
+        foreach (char letter in "abcdefghijklmnopqrstuvwxyz") debugValues.Add($"{letter}: {this.LetterValues.GetValue(letter)}");
         Debug.Log($"Letter Values: {string.Join(", ", debugValues)}");
 
         this.uiManager = Instantiate(this.userInterfacePrefab).GetComponent<UserInterfaceManager>();
@@ -257,12 +257,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
         this.TurnIncremented?.Invoke(lastPlayer, currentPlayer, this.turnCount);
 
         Debug.Log($"End of turn {this.turnCount - 1}, starting turn {this.turnCount} (Player {currentPlayer.photonView.ViewID})");
-    }
-
-    public int CalculateDamage(string word) {
-        int damage = 0;
-        foreach (char letter in word.ToLower()) damage += this.letterValues.GetValue(letter);
-        return damage;
     }
 
     private void SetGameState(GameState gameState) {
