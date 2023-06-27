@@ -33,35 +33,28 @@ public class Submission {
         this.gameManager = GameManager.Instance;
         this.Input = input;
         this.Word = this.gameManager.WordList.Get(input);
-        this.Relation = this.Word.GetRelation(Submission.PreviousSubmission?.Input);
-        this.Damage = this.CalculateDamage(input, this.Relation);
+        this.Relation = this.Word?.GetRelation(Submission.PreviousSubmission?.Input) ?? WordRelation.None;
+        this.Damage = this.CalculateDamage();
         this.Healing = this.Relation == WordRelation.Synonym;
         PreviousSubmission = this;
     }
 
-    /// <summary>
-    /// Gets the relation of the given word to the previously played word
-    /// </summary>
-    /// <param name="input">The currently submitted input</param>
+    /// <summary>Gets the relation of the given word to the previously played word</summary>
     /// <returns>The relation of the current input to the most previous submission</returns>
-    private WordRelation GetWordRelation(string input) {
+    private WordRelation GetWordRelation() {
+        string previousInput = Submission.PreviousSubmission?.Input;
         WordData previousWord = this.gameManager.WordList.Get(Submission.PreviousSubmission?.Input);
-        return previousWord != null ? previousWord.GetRelation(input) : WordRelation.None;
+        return previousWord != null ? previousWord.GetRelation(previousInput) : WordRelation.None;
     }
 
-    /// <summary>
-    /// Calculates the damage that should be dealt to the player
-    /// </summary>
-    /// <param name="input"></param>
-    /// <param name="relation"></param>
-    /// <returns></returns>
-    private int CalculateDamage(string input, WordRelation relation) {
-        string previousInput = Submission.PreviousSubmission?.Input;
+    /// <summary>Calculates the damage that should be dealt to the player</summary>
+    private int CalculateDamage() {
+        string previousInput = Submission.PreviousSubmission?.Input ?? string.Empty;
         int baseDamage = 0;
         int opponentDamage = 0;
-        foreach (char letter in input.ToLower()) baseDamage += this.gameManager.LetterValues.GetValue(letter);
+        foreach (char letter in this.Input.ToLower()) baseDamage += this.gameManager.LetterValues.GetValue(letter);
         foreach (char letter in previousInput.ToLower()) opponentDamage += this.gameManager.LetterValues.GetValue(letter);
-        return relation switch {
+        return this.Relation switch {
             WordRelation.Synonym => baseDamage * 2,
             WordRelation.Antonym => opponentDamage * 2,
             WordRelation.Related => baseDamage * 2,
