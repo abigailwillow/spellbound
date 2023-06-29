@@ -19,8 +19,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public readonly int MAX_PLAYERS = 2;
     /// <summary>The current game state</summary>
     public GameState GameState { get; private set; } = GameState.None;
-    /// <summary>The current menu state</summary>
-    private MenuState menuState = MenuState.None;
     [Header("Prefabs")]
     /// <summary>The player prefab that gets spawned on the menu or when a player connects</summary>
     [SerializeField] private GameObject playerPrefab;
@@ -31,7 +29,8 @@ public class GameManager : MonoBehaviourPunCallbacks {
     [SerializeField] private Binding localPlayerBinding;
     /// <summary>The letter values for each letter</summary>
     public LetterValues LetterValues;
-    private UserInterfaceManager uiManager;
+    /// <summary>The user interface manager</summary>
+    public UserInterfaceManager UIManager;
     private int turnCount = -1;
     private string[] connectingMesages = new string[] { "Connecting...", "Finding opponent...", "Still looking...", "Almost there...", "You can type CANCEL to return..." };
     private float connectingMessageDelay = 10f;
@@ -41,6 +40,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     [SerializeField] private int maxTurnTime = 30;
     public float TurnStarted { get; private set; } = 0;
     private bool turnSkipped = false;
+    private MenuStateMachine menuStateMachine;
 
     # region Events
     /// <summary>Called when a player is instantiated</summary>
@@ -62,21 +62,29 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
         # endregion
 
+        // Register player prefab and connect to Photon
         PhotonNetwork.PrefabPool.Register(this.playerPrefab);
         PhotonNetwork.ConnectUsingSettings();
 
+        // Load word list from file
         WordList = WordDataList.Deserialize(Resources.Load<TextAsset>("WordLists/ExtendedWords"));
         Debug.Log($"Loaded {WordList.Words.Count} words");
         Debug.Log($"Valid Words: {string.Join(", ", WordList.Words.ConvertAll(word => word.Word))}");
 
+        // Load letter values
         List<string> debugValues = new List<string>();
         foreach (char letter in "abcdefghijklmnopqrstuvwxyz") debugValues.Add($"{letter}: {this.LetterValues.GetValue(letter)}");
         Debug.Log($"Letter Values: {string.Join(", ", debugValues)}");
 
-        this.uiManager = Instantiate(this.userInterfacePrefab).GetComponent<UserInterfaceManager>();
+        // Instantiate the user interface manager
+        this.UIManager = Instantiate(this.userInterfacePrefab).GetComponent<UserInterfaceManager>();
 
+        // Create the menu state machine
+        this.menuStateMachine = new MenuStateMachine(this);
+        
+        // Check if player has completed the tutorial, if not start the tutorial
         if (PlayerPrefs.GetInt("CompletedTutorial", 0) == 0) {
-            this.SetMenuState(MenuState.Tutorial);
+            this.menuStateMachine.SetMenuState(MenuState.Tutorial);
         }
     }
 
@@ -92,7 +100,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         if (this.GameState == GameState.Connecting) {
             if (this.connectingMessageStartTime <= Time.time) {
                 this.connectingMessageStartTime = this.connectingMessageDelay + Time.time;
-                this.uiManager.SetInstruction(this.connectingMesages[UnityEngine.Random.Range(0, this.connectingMesages.Length)]);
+                this.UIManager.SetInstruction(this.connectingMesages[UnityEngine.Random.Range(0, this.connectingMesages.Length)]);
             }
         }
 
@@ -101,7 +109,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
             if (!this.turnSkipped) {
                 this.turnSkipped = true;
                 this.NextTurn();
-                this.uiManager.SetInstruction("Turn skipped, timer ran out", "");
+                this.UIManager.SetInstruction("Turn skipped, timer ran out", "");
             } else {
                 this.SetPostGame(PlayerType.None, WinReason.Time);
             }
@@ -125,7 +133,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
                 _ => "won"
             };
 
-            this.uiManager.SetInstruction($"You {result} because {loser} {reason}", () => this.SetGameState(GameState.Menu));
+            this.UIManager.SetInstruction($"You {result} because {loser} {reason}", () => this.SetGameState(GameState.Menu));
         } else {
             // If any other state, go back to the menu by default
             PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsOpen = false });
@@ -191,64 +199,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
     /// <summary>Called when an input is submitted, handles all the menu logic</summary>
     private void InputSubmitted(PlayerController player, Submission submission) {
         if (this.GameState == GameState.Menu) {
-            if (this.menuState == MenuState.Tutorial) {
-                if (submission.Input.ToLower() == "spellbound") {
-                    this.uiManager.SetInstruction(() => this.SetMenuState(MenuState.Name),
-                        "You just cast your first spell!",
-                        "That's all there is to it\nYou now know how to play Spellbound",
-                        "One last thing, you have to pick a name before you start playing\nYou can change it at any time",
-                        "Have fun casting spells!"
-                    );
-                    PlayerPrefs.SetInt("CompletedTutorial", 1);
-                }
-            } else {
-                switch (submission.Input.ToLower()) {
-                    case "start":
-                        if (PhotonNetwork.LocalPlayer.NickName != string.Empty) {
-                            this.SetGameState(GameState.Connecting);
-                            PhotonNetwork.LeaveRoom();
-                        } else {
-                            this.uiManager.SetInstruction("Please pick a name first", () => this.SetMenuState(MenuState.Menu));
-                        }
-                        break;
-                    case "name":
-                        this.SetMenuState(MenuState.Name);
-                        break;
-                    case "tutorial":
-                        this.SetMenuState(MenuState.Tutorial);
-                        break;
-                    case "sprite":
-                        this.SetMenuState(MenuState.Sprite);
-                        break;
-                    default:
-                        if (this.menuState == MenuState.Name) {
-                            PhotonNetwork.LocalPlayer.NickName = submission.Input;
-                            this.LocalPlayer.NameUpdated?.Invoke(this.LocalPlayer, submission.Input);
-                            PlayerPrefs.SetString("Nickname", submission.Input);
-                            this.uiManager.SetInstruction($"Your name is now {submission.Input.ToUpper()}", () => this.SetMenuState(MenuState.Menu));
-
-                            Debug.Log($"Player {player.photonView.ViewID} changed their name to {submission.Input}");
-                        } else if (this.menuState == MenuState.Sprite) {
-                            int maxSprites = this.LocalPlayer.Sprites.Length;
-                            if (Char.TryParse(submission.Input, out char spriteChar) && spriteChar >= 'A' && spriteChar <= 'A' + maxSprites) {
-                                int index = spriteChar - 'A';
-                                this.LocalPlayer.SpriteIndex = index;
-                                PlayerPrefs.SetInt("SpriteIndex", index);
-
-                                this.uiManager.SetInstruction($"Your sprite is now {submission.Input}", () => this.SetMenuState(MenuState.Menu));
-                                this.uiManager.ToggleCharacterPreview(false);
-
-                                Debug.Log($"Player {player.photonView.ViewID} changed their sprite to sprite {index}");
-                            } else {
-                                this.uiManager.SetInstruction($"Invalid sprite {submission.Input}", () => this.SetMenuState(MenuState.Sprite));
-                                break;
-                            }
-                        } else {
-                            this.uiManager.SetInstruction($"Invalid command {submission.Input}", () => this.SetMenuState(MenuState.Menu));
-                        }
-                        break;
-                }
-            }
+            this.menuStateMachine.HandleInput(player, submission.Input);
         } else if (this.GameState == GameState.Playing) {
             if (submission.Input.ToLower() == "exit" && player.PlayerType == PlayerType.Local) {
                 this.SetPostGame(PlayerType.Remote, WinReason.Disconnect);
@@ -280,44 +231,14 @@ public class GameManager : MonoBehaviourPunCallbacks {
     }
 
     /// <summary>Sets the game state and invokes the GameStateChanged event</summary>
-    private void SetGameState(GameState gameState) {
+    public void SetGameState(GameState gameState) {
         this.GameState = gameState;
         this.GameStateChanged?.Invoke(gameState);
 
         // If the game state is set to menu, make sure the menu state also defaults to the main menu
-        if (gameState == GameState.Menu) this.SetMenuState(MenuState.Menu);
+        if (gameState == GameState.Menu) this.menuStateMachine.SetMenuState(MenuState.Menu);
 
         Debug.Log($"Game State changed to {gameState}");
-    }
-
-    /// <summary>Sets the menu state, and sets the instruction text based on the menu state</summary>
-    private void SetMenuState(MenuState menuState) {
-        this.menuState = menuState;
-        switch (menuState) {
-            case MenuState.Menu:
-                this.uiManager.SetInstruction("Type START to start the game\nType NAME to change your name\nType SPRITE to change your sprite\nType TUTORIAL to play the tutorial");
-                break;
-            case MenuState.Name:
-                this.uiManager.SetInstruction("Please enter your name");
-                break;
-            case MenuState.Sprite:
-                this.uiManager.SetInstruction($"Please choose your desired sprite");
-                this.uiManager.ToggleCharacterPreview(true);
-                break;
-            case MenuState.Tutorial:
-                this.uiManager.SetInstruction(
-                    "Welcome to Spellbound!",
-                    "In this game players take turns spelling words to cast spells on each other",
-                    "The longer the word, and less common the letters, the more damage your spell will inflict",
-                    "Words with relations to other words have special effects",
-                    "Synonyms heal you\nAntonyms deflect incoming spells\nRelated words amplify your spells",
-                    "You can type EXIT during a game to return to the menu",
-                    "Type SPELLBOUND to get started"
-                );
-                break;
-        }
-
-        Debug.Log($"Menu State changed to {menuState}");
     }
 
     /// <summary>Sets the game state to post game, sets the winner and win reason, and leaves the room</summary>

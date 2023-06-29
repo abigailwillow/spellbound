@@ -26,15 +26,6 @@ public enum GameState {
     PostGame
 }
 
-/// <summary>The state of the menu, if the game state is also set to menu</summary>
-public enum MenuState {
-    None,
-    Menu,
-    Name,
-    Sprite,
-    Tutorial
-}
-
 /// <summary>The reason a player won</summary>
 public enum WinReason {
     None,

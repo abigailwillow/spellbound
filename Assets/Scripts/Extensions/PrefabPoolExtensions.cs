@@ -2,9 +2,7 @@ using UnityEngine;
 using Photon.Pun;
 
 public static class PrefabPoolExtensions {
-    /// <summary>
-    /// Register prefabs to be network instantiated without having to exist in the Resources folder
-    /// </summary>
+    /// <summary>Register prefabs to be network instantiated without having to exist in the Resources folder</summary>
     /// <param name="prefabs">The prefab(s) to be instantiated</param>
     public static void Register(this IPunPrefabPool prefabPool, params GameObject[] prefabs) {
         // Add the first prefab to the list
