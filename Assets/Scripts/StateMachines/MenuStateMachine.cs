@@ -15,6 +15,7 @@ public class MenuStateMachine {
         this.SetMenuState(MenuState.Menu);
     }
 
+    /// <summary>Exits the previous menu state, then enters the new menu state</summary>
     public void SetMenuState(MenuState menuState) {
         if (this.currentState != null) this.currentState.Exit();
         this.currentState = this.states[menuState];
@@ -25,6 +26,7 @@ public class MenuStateMachine {
 
     public void Update() => this.currentState.Update();
 
+    /// <summary>Handles the given input for the current menu state and calls the associated function</summary>
     public void HandleInput(PlayerController player, string input) => this.currentState.OnInputSubmitted(player, input);
 }
 
