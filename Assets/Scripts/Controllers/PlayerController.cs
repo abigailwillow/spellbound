@@ -180,3 +180,10 @@ public class PlayerController : MonoBehaviourPun {
     /// <summary>Enable or disable the player's input</summary>
     public void ToggleInput(bool enabled) => this.input.enabled = enabled;
 }
+
+/// <summary>Whether this player is local or remote</summary>
+public enum PlayerType {
+    None,
+    Local,
+    Remote
+}

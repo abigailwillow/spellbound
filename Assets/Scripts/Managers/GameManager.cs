@@ -251,3 +251,20 @@ public class GameManager : MonoBehaviourPunCallbacks {
         PhotonNetwork.LeaveRoom();
     }
 }
+
+/// <summary>The state of the game</summary>
+public enum GameState {
+    None,
+    Menu,
+    Connecting,
+    Playing,
+    PostGame
+}
+
+/// <summary>The reason a player won</summary>
+public enum WinReason {
+    None,
+    Health,
+    Time,
+    Disconnect
+}

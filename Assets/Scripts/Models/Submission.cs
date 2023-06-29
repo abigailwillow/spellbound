@@ -50,3 +50,23 @@ public class Submission {
         };
     }
 }
+
+/// <summary>The type of word</summary>
+public enum WordType {
+    Noun,
+    Pronoun,
+    Verb,
+    Adjective,
+    Adverb,
+    Preposition,
+    Conjunction,
+    Interjection
+}
+
+/// <summary>The relation of a word to another word</summary>
+public enum WordRelation {
+    None,
+    Synonym,
+    Antonym,
+    Related
+}
