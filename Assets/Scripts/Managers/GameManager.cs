@@ -32,9 +32,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
     /// <summary>The user interface manager</summary>
     public UserInterfaceManager UIManager;
     private int turnCount = -1;
-    private string[] connectingMesages = new string[] { "Connecting...", "Finding opponent...", "Still looking...", "Almost there...", "You can type CANCEL to return..." };
-    private float connectingMessageDelay = 10f;
-    private float connectingMessageStartTime = 0f;
     private PlayerType winner = PlayerType.None;
     private WinReason winReason = WinReason.None;
     [SerializeField] private int maxTurnTime = 30;
@@ -89,20 +86,14 @@ public class GameManager : MonoBehaviourPunCallbacks {
     }
 
     private void Update() {
+        if (this.GameState == GameState.Menu || this.GameState == GameState.Connecting) this.menuStateMachine.Update();
+
         // Position players
         float cameraHalfWidth = (Camera.main.orthographicSize * Camera.main.aspect) / 2;
         this.Players.ForEach(player => {
             if (!player) return;
             player.transform.position = new Vector3(cameraHalfWidth * (player.PlayerType == PlayerType.Local ? -1 : 1), 0, 0);
         });
-
-        // Show randomized connecting messages
-        if (this.GameState == GameState.Connecting) {
-            if (this.connectingMessageStartTime <= Time.time) {
-                this.connectingMessageStartTime = this.connectingMessageDelay + Time.time;
-                this.UIManager.SetInstruction(this.connectingMesages[UnityEngine.Random.Range(0, this.connectingMesages.Length)]);
-            }
-        }
 
         // Check if in game and the turn timer has run out
         if (this.GameState == GameState.Playing && Time.time > this.TurnStarted + this.maxTurnTime) {
@@ -198,18 +189,13 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     /// <summary>Called when an input is submitted, handles all the menu logic</summary>
     private void InputSubmitted(PlayerController player, Submission submission) {
-        if (this.GameState == GameState.Menu) {
+        if (this.GameState == GameState.Menu || this.GameState == GameState.Connecting) {
             this.menuStateMachine.HandleInput(player, submission.Input);
         } else if (this.GameState == GameState.Playing) {
             if (submission.Input.ToLower() == "exit" && player.PlayerType == PlayerType.Local) {
                 this.SetPostGame(PlayerType.Remote, WinReason.Disconnect);
             } else {
                 this.NextTurn();
-            }
-        } else if (this.GameState == GameState.Connecting) {
-            if (submission.Input.ToLower() == "cancel") {
-                this.SetGameState(GameState.Menu);
-                PhotonNetwork.LeaveRoom();
             }
         }
     }
@@ -235,8 +221,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
         this.GameState = gameState;
         this.GameStateChanged?.Invoke(gameState);
 
-        // If the game state is set to menu, make sure the menu state also defaults to the main menu
+        // If the game state is set to menu or connecting, make sure the menu state matches the game state
         if (gameState == GameState.Menu) this.menuStateMachine.SetMenuState(MenuState.Menu);
+        if (gameState == GameState.Connecting) this.menuStateMachine.SetMenuState(MenuState.Connecting);
 
         Debug.Log($"Game State changed to {gameState}");
     }

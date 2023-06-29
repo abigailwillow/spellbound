@@ -9,6 +9,7 @@ public class MenuStateMachine {
         this.states = new Dictionary<MenuState, BaseMenuState>() {
             { MenuState.Menu, new MainMenuState(this, gameManager) },
             { MenuState.Name, new NameMenuState(this, gameManager) },
+            { MenuState.Connecting, new ConnectingMenuState(this, gameManager) },
             { MenuState.Sprite, new SpriteMenuState(this, gameManager) },
             { MenuState.Tutorial, new TutorialMenuState(this, gameManager) }
         };
@@ -34,6 +35,7 @@ public class MenuStateMachine {
 public enum MenuState {
     None,
     Menu,
+    Connecting,
     Name,
     Sprite,
     Tutorial

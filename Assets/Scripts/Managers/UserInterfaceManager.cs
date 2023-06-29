@@ -144,6 +144,7 @@ public class UserInterfaceManager : MonoBehaviour {
         Enumerable.Reverse(player.Submissions).Take(5).ToList().ForEach(submission => playerElements.InputHistory.text += $"{submission.Input}\n");
 
         // Display information about the damage and relation of the submission
+        if (this.gameManager.GameState != GameState.Playing) return;
         string damageText = submission.Relation == WordRelation.None ? 
             $"{submission.Damage} " :
             $"{submission.Relation.ToString().ToUpper()}! {submission.Damage} ";
