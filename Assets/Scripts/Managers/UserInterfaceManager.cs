@@ -128,12 +128,14 @@ public class UserInterfaceManager : MonoBehaviour {
 
     private void WordSubmitted(PlayerController player, Submission submission) {
         PlayerElements playerElements = this.GetPlayerElements(player.PlayerType);
+        playerElements.InputText.text = string.Empty;
         playerElements.InputHistory.text = string.Empty;
         Enumerable.Reverse(player.Submissions).Take(5).ToList().ForEach(submission => playerElements.InputHistory.text += $"{submission.Input}\n");
 
         if (this.gameManager.GameState != GameState.Playing) return;
-        string damageText = submission.Relation == WordRelation.None ? string.Empty :
-        $"{submission.Relation.ToString().ToUpper()}! {submission.Damage} ";
+        string damageText = submission.Relation == WordRelation.None ? 
+            $"{submission.Damage} " :
+            $"{submission.Relation.ToString().ToUpper()}! {submission.Damage} ";
         damageText += submission.Healing ? "HEALED" : "DAMAGE";
         damageText += submission.Relation != WordRelation.None ? $" (×2)" : string.Empty;
         this.SetInstruction(damageText, "");

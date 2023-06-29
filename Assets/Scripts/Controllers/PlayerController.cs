@@ -126,9 +126,8 @@ public class PlayerController : MonoBehaviourPun {
 
     [PunRPC] public void RPCSubmit(string input) {
         if (string.IsNullOrEmpty(input)) return;
+        Submission submission = new Submission(input);
         if (this.gameManager.GameState == GameState.Playing) {
-            Submission submission = new Submission(input);
-
             if (input == this.exit) { this.SubmitSubmission(submission); return; }
             if (!submission.Valid) { Debug.Log($"[{this.PlayerType}] Not a valid word ({input})"); return; }
 
@@ -147,7 +146,7 @@ public class PlayerController : MonoBehaviourPun {
                 $"Related: {string.Join(", ", submission.Word.RelatedWords)})"
             );
         } else {
-            this.Submit(input);
+            this.SubmitSubmission(submission);
         }
     }
 
@@ -158,8 +157,8 @@ public class PlayerController : MonoBehaviourPun {
     private void SubmitSubmission(Submission submission) {
         this.InputText = string.Empty;
         this.InputTextUpdated?.Invoke(this, submission.Input);
-        this.Submitted?.Invoke(this, submission);
         if (this.gameManager.GameState == GameState.Playing) this.Submissions.Add(submission);
+        this.Submitted?.Invoke(this, submission);
     }
 
     /// <summary>
