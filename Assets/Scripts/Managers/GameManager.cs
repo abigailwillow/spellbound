@@ -5,19 +5,31 @@ using Photon.Pun;
 using Photon.Realtime;
 
 public class GameManager : MonoBehaviourPunCallbacks {
+    /// <summary>The singleton instance, it is necessary to use to access the Game Manager</summary>
     public static GameManager Instance { get; private set; }
+    /// <summary>The list of players in the game</summary>
     public List<PlayerController> Players { get; private set; } = new List<PlayerController>(2);
+    /// <summary>The local player</summary>
     public PlayerController LocalPlayer => Players.Find(player => player.PlayerType == PlayerType.Local);
+    /// <summary>The remote player</summary>
     public PlayerController RemotePlayer => Players.Find(player => player.PlayerType == PlayerType.Remote);
+    /// <summary>The currently loaded word list</summary>
     public WordDataList WordList { get; private set; }
+    /// <summary>The maximum number of players in a game, read-only</summary>
     public readonly int MAX_PLAYERS = 2;
+    /// <summary>The current game state</summary>
     public GameState GameState { get; private set; } = GameState.None;
+    /// <summary>The current menu state</summary>
     private MenuState menuState = MenuState.None;
     [Header("Prefabs")]
+    /// <summary>The player prefab that gets spawned on the menu or when a player connects</summary>
     [SerializeField] private GameObject playerPrefab;
+    /// <summary>The user interface prefab that gets spawned on game start</summary>
     [SerializeField] private GameObject userInterfacePrefab;
     [Header("Miscellaneous")]
+    /// <summary>The binding which will be used for the local player</summary>
     [SerializeField] private Binding localPlayerBinding;
+    /// <summary>The letter values for each letter</summary>
     public LetterValues LetterValues;
     private UserInterfaceManager uiManager;
     private int turnCount = -1;
@@ -31,18 +43,12 @@ public class GameManager : MonoBehaviourPunCallbacks {
     private bool turnSkipped = false;
 
     # region Events
-    /// <summary>
-    /// Called when a player is instantiated
-    /// </summary>
+    /// <summary>Called when a player is instantiated</summary>
     public Action<PlayerController> PlayerInstantiated;
-    /// <summary>
-    /// Called when a player is destroyed
-    /// </summary>
+    /// <summary>Called when a player is destroyed</summary>
     public Action<PlayerType> PlayerDestroyed;
     public Action<GameState> GameStateChanged;
-    /// <summary>
-    /// Called when the next turn is started. The first parameter is the previous player, the second parameter is the current player, and the third parameter is the turn count
-    /// </summary>
+    /// <summary>Called when the next turn is started. The first parameter is the previous player, the second parameter is the current player, and the third parameter is the turn count</summary>
     public Action<PlayerController, PlayerController, int> TurnIncremented;
     # endregion
 
@@ -104,8 +110,10 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
     public override void OnConnectedToMaster() {
         if (this.GameState == GameState.Connecting) {
+            // Try to find an available room if we're trying to connect
             PhotonNetwork.JoinRandomRoom();
         } else if (this.GameState == GameState.PostGame) {
+            // If the game is over, show whether the local player won or lost and the reason
             PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsOpen = false });
             string loser = this.winner == PlayerType.Local ? "your opponent" : "you";
             string result = this.winner == PlayerType.Local ? "WON" : "LOST";
@@ -119,6 +127,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
             this.uiManager.SetInstruction($"You {result} because {loser} {reason}", () => this.SetGameState(GameState.Menu));
         } else {
+            // If any other state, go back to the menu by default
             PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsOpen = false });
             this.SetGameState(GameState.Menu);
         }
@@ -129,15 +138,18 @@ public class GameManager : MonoBehaviourPunCallbacks {
     public override void OnPlayerEnteredRoom(Player remotePlayer) => Debug.Log($"Remote player joined the room");
 
     public override void OnPlayerLeftRoom(Player remotePlayer) {
+        // If the other player left set this player as the winner by default
         if (this.GameState == GameState.Playing) this.SetPostGame(PlayerType.Local, WinReason.Disconnect);
 
         Debug.Log($"Remote player left the room");
     }
 
     public override void OnLeftRoom() {
+        // Reset game variables when leaving a room
         this.Players.Clear();
         this.turnCount = -1;
         this.turnSkipped = false;
+        // If we're still playing, set the local player as the loser
         if (this.GameState == GameState.Playing) this.SetPostGame(PlayerType.Remote, WinReason.Disconnect);
     }
 
@@ -149,11 +161,15 @@ public class GameManager : MonoBehaviourPunCallbacks {
     }
 
     public override void OnJoinRandomFailed(short returnCode, string message) {
-        Debug.Log($"Could not join a random room ({message}), creating a new room");
+        // If we couldn't find a room, create a new one
         PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = (byte)this.MAX_PLAYERS, IsOpen = true });
+
+        Debug.Log($"Could not join a random room ({message}), creating a new room");
     }
 
+    /// <summary>Add a player to the internal list, sort them, and execute game start logic if the game is ready to start</summary>
     public bool AddPlayer(PlayerController player) {
+        // If the game is already full, don't add the player
         bool valid = this.Players.Count < this.MAX_PLAYERS;
         if (valid) {
             this.Players.Add(player);
@@ -161,6 +177,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
             this.PlayerInstantiated?.Invoke(player);
             player.Submitted += this.InputSubmitted;
 
+            // If the game is full, start the game
             if (this.Players.Count == MAX_PLAYERS) {
                 this.SetGameState(GameState.Playing);
                 this.NextTurn();
@@ -171,6 +188,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         return valid;
     }
 
+    /// <summary>Called when an input is submitted, handles all the menu logic</summary>
     private void InputSubmitted(PlayerController player, Submission submission) {
         if (this.GameState == GameState.Menu) {
             if (this.menuState == MenuState.Tutorial) {
@@ -245,7 +263,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
         }
     }
 
+    /// <summary>Increments the turn count, ends the turn of the current player and starts the turn for the next player</summary>
     public void NextTurn() {
+        // If the game isn't playing, we can't execute any turn logic
         if (this.GameState != GameState.Playing) return;
         this.turnCount++;
         this.TurnStarted = Time.time;
@@ -259,15 +279,18 @@ public class GameManager : MonoBehaviourPunCallbacks {
         Debug.Log($"End of turn {this.turnCount - 1}, starting turn {this.turnCount} (Player {currentPlayer.photonView.ViewID})");
     }
 
+    /// <summary>Sets the game state and invokes the GameStateChanged event</summary>
     private void SetGameState(GameState gameState) {
         this.GameState = gameState;
         this.GameStateChanged?.Invoke(gameState);
 
+        // If the game state is set to menu, make sure the menu state also defaults to the main menu
         if (gameState == GameState.Menu) this.SetMenuState(MenuState.Menu);
 
         Debug.Log($"Game State changed to {gameState}");
     }
 
+    /// <summary>Sets the menu state, and sets the instruction text based on the menu state</summary>
     private void SetMenuState(MenuState menuState) {
         this.menuState = menuState;
         switch (menuState) {
@@ -297,9 +320,7 @@ public class GameManager : MonoBehaviourPunCallbacks {
         Debug.Log($"Menu State changed to {menuState}");
     }
 
-    /// <summary>
-    /// Sets the game state to post game, sets the winner and win reason, and leaves the room
-    /// </summary>
+    /// <summary>Sets the game state to post game, sets the winner and win reason, and leaves the room</summary>
     /// <param name="winner">Whether the local or remote player won</param>
     /// <param name="winReason">The reason why that player won</param>
     public void SetPostGame(PlayerType winner, WinReason winReason) {

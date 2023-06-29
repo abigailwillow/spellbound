@@ -1,30 +1,18 @@
 public class Submission {
     public static Submission PreviousSubmission { get; private set; }
-    /// <summary>
-    /// Whether or not the submission was valid
-    /// </summary>
+    /// <summary>Whether or not the submission was valid</summary>
     public bool Valid => this.Word != null;
-    /// <summary>
-    /// The input string that was submitted
-    /// </summary>
+    /// <summary>The input string that was submitted</summary>
     public string Input { get; private set; }
-    /// <summary>
-    /// The word that was submitted
-    /// </summary>
+    /// <summary>The word that was submitted</summary>
     public WordData Word { get; private set; }
-    /// <summary>
-    /// The relation of this word to the last played word
-    /// </summary>
+    /// <summary>The relation of this word to the last played word</summary>
     /// <remarks>Defaults to WordRelation.None if the submission was invalid</remarks>
     public WordRelation Relation { get; private set; }
-    /// <summary>
-    /// The damage that should be dealt to the player
-    /// </summary>
+    /// <summary>The damage that should be dealt to the player</summary>
     /// <remarks>Zero if the submission was invalid</remarks>
     public int Damage { get; private set; }
-    /// <summary>
-    /// Whether or not the damage of this word should be healed instead
-    /// </summary>
+    /// <summary>Whether or not the damage of this word should be healed instead</summary>
     /// <remarks>False if the submission was invalid</remarks>
     public bool Healing { get; private set; }
     private GameManager gameManager;

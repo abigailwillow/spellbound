@@ -3,6 +3,7 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "LetterValues", menuName = "Spellbound/Letter Values")]
 public class LetterValues : ScriptableObject {
+    /// <summary>The value of each letter</summary>
     public List<LetterValue> Letters = new List<LetterValue>() {
         new LetterValue('a', 1),
         new LetterValue('b', 3),
@@ -32,6 +33,7 @@ public class LetterValues : ScriptableObject {
         new LetterValue('z', 10)
     };
 
+    /// <summary>Gets the value of a specific character</summary>
     public int GetValue(char letter) => Letters.Find(l => l.Letter == letter).Value;
 
     [System.Serializable] public class LetterValue {

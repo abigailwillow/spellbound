@@ -90,9 +90,7 @@ public class UserInterfaceManager : MonoBehaviour {
         this.timerLabel.text = $"{(this.gameManager.TurnStarted - Time.time) + 30:0.0}";
     }
 
-    /// <summary>
-    /// Toggle a specific player panel on or off
-    /// </summary>
+    /// <summary>Toggle a specific player panel on or off</summary>    
     /// <param name="enabled">Whether to enable or disable the panel</param>
     /// <param name="playerType">Which player's panel to enable or disable</param>
     public void SetPlayerPanelActive(bool enabled, PlayerType playerType) {
