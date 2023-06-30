@@ -13,7 +13,6 @@ public class MenuStateMachine {
             { MenuState.Sprite, new SpriteMenuState(this, gameManager) },
             { MenuState.Tutorial, new TutorialMenuState(this, gameManager) }
         };
-        this.SetMenuState(MenuState.Menu);
     }
 
     /// <summary>Exits the previous menu state, then enters the new menu state</summary>
