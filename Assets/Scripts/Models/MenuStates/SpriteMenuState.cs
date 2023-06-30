@@ -1,8 +1,17 @@
-using System;
+using System.Globalization;
 using UnityEngine;
 
 public class SpriteMenuState : BaseMenuState {
-    public SpriteMenuState(MenuStateMachine stateMachine, GameManager gameManager) : base(stateMachine, gameManager) { }
+    private string[] names = { "sara", "senna", "ruby", "dexter", "emmet", "oscar" };
+
+    public SpriteMenuState(MenuStateMachine stateMachine, GameManager gameManager) : base(stateMachine, gameManager) {
+        for (int i = 0; i < this.names.Length; i++) {
+            int index = i;
+            this.AddInput(this.names[i], (player, input) => {
+                this.SetSprite(player, input, index);
+            });
+        }
+    }
 
     public override void Enter() {
         this.gameManager.UIManager.SetInstruction($"Please choose your desired sprite");
@@ -11,18 +20,18 @@ public class SpriteMenuState : BaseMenuState {
 
     public override void Exit() => this.gameManager.UIManager.ToggleCharacterPreview(false);
 
-    public override void OnInputSubmitted(PlayerController player, string input) {
+    private void SetSprite(PlayerController player, string input, int index) {
         int maxSprites = this.gameManager.LocalPlayer.Sprites.Length;
-        if (Char.TryParse(input, out char spriteChar) && spriteChar >= 'A' && spriteChar <= 'A' + maxSprites) {
-            int index = spriteChar - 'A';
+        string name = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(input);
+        if (index >= 0 && index < maxSprites) {
             this.gameManager.LocalPlayer.SpriteIndex = index;
             PlayerPrefs.SetInt("SpriteIndex", index);
 
-            this.gameManager.UIManager.SetInstruction($"Your sprite is now {input}", () => this.stateMachine.SetMenuState(MenuState.Menu));
+            this.gameManager.UIManager.SetInstruction($"Your character is now {name}", () => this.stateMachine.SetMenuState(MenuState.Menu));
 
-            Debug.Log($"Player {player.photonView.ViewID} changed their sprite to sprite {index}");
+            Debug.Log($"Player {player.photonView.ViewID} changed their character to {name} ({index})");
         } else {
-            this.gameManager.UIManager.SetInstruction($"Invalid sprite {input}", () => this.stateMachine.SetMenuState(MenuState.Sprite));
+            this.gameManager.UIManager.SetInstruction($"Invalid character {input}", () => this.stateMachine.SetMenuState(MenuState.Sprite));
         }
     }
 }

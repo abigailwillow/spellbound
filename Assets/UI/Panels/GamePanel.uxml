@@ -2,7 +2,7 @@
     <Style src="project://database/Assets/UI/Stylesheets/GamePanel.uss?fileID=7433441132597879392&amp;guid=f90568ac2939650419af923c190f5f6f&amp;type=3#GamePanel" />
     <ui:VisualElement name="LocalPlayerPanel" class="player-panel">
         <ui:Label display-tooltip-when-elided="true" name="Username" text="Player" class="username-label" />
-        <ui:VisualElement name="HealthBar" class="health-bar" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; height: 96px; background-image: url(&apos;project://database/Assets/Sprites/HealthBarBackground.png?fileID=21300000&amp;guid=0b35d8d6522312c42a82b4d4fb79fa45&amp;type=3#HealthBarBackground&apos;); display: flex;">
+        <ui:VisualElement name="HealthBar" class="health-bar" style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; height: 96px; background-image: url(&apos;project://database/Assets/Sprites/HealthBar/HealthBarBackground.png?fileID=21300000&amp;guid=0b35d8d6522312c42a82b4d4fb79fa45&amp;type=3#HealthBarBackground&apos;); display: flex;">
             <ui:VisualElement name="HealthFill" class="health-bar-fill" style="display: flex;">
                 <ui:Label text="100/100" display-tooltip-when-elided="true" name="HealthText" class="health-text" />
             </ui:VisualElement>
@@ -13,7 +13,7 @@
     <ui:VisualElement name="RemotePlayerPanel" class="player-panel" style="width: 50%; padding-left: 64px; padding-right: 64px; padding-top: 32px; padding-bottom: 32px;">
         <ui:Label display-tooltip-when-elided="true" name="Username" text="Player" class="username-label" />
         <ui:VisualElement name="HealthBar" class="health-bar">
-            <ui:VisualElement name="HealthFill" class="health-bar-fill" style="background-image: url(&apos;project://database/Assets/Sprites/HealthBarForeground.png?fileID=21300000&amp;guid=4d9da6976204af641bebf9740459f68f&amp;type=3#HealthBarForeground&apos;); height: auto; flex-grow: 1; -unity-slice-right: 0; transition-timing-function: ease-in-out;">
+            <ui:VisualElement name="HealthFill" class="health-bar-fill" style="background-image: url(&apos;project://database/Assets/Sprites/HealthBar/HealthBarForeground.png?fileID=21300000&amp;guid=4d9da6976204af641bebf9740459f68f&amp;type=3#HealthBarForeground&apos;); height: auto; flex-grow: 1; -unity-slice-right: 0; transition-timing-function: ease-in-out;">
                 <ui:Label text="100/100" display-tooltip-when-elided="true" name="HealthText" class="health-text" style="flex-grow: 1; -unity-text-align: middle-center; font-size: 48px; padding-left: 0; padding-right: 0; padding-top: 0; padding-bottom: 0; color: rgb(255, 255, 255);" />
             </ui:VisualElement>
         </ui:VisualElement>
@@ -21,33 +21,33 @@
         <ui:Label display-tooltip-when-elided="true" name="InputHistory" class="history-label" style="padding-left: 1px; padding-right: 1px; padding-top: 1px; padding-bottom: 1px; -unity-text-align: lower-center;" />
     </ui:VisualElement>
     <ui:VisualElement name="InstructionPanel" style="position: absolute; right: 0;">
-        <ui:VisualElement name="SpritesF" class="sprite-row" style="background-color: rgba(0, 0, 0, 0); visibility: visible; display: none;">
-            <ui:VisualElement name="SpriteA" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
-                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Witch1.png?fileID=21300000&amp;guid=d90a0031ff90f7c4f9535116683c0494&amp;type=3#Witch1&apos;);" />
-                <ui:Label tabindex="-1" text="A" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+        <ui:VisualElement name="SpritesF" class="sprite-row" style="background-color: rgba(0, 0, 0, 0); visibility: visible;">
+            <ui:VisualElement name="Sara" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Player/Witch1.png?fileID=21300000&amp;guid=d90a0031ff90f7c4f9535116683c0494&amp;type=3#Witch1&apos;);" />
+                <ui:Label tabindex="-1" text="Sara" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
             </ui:VisualElement>
-            <ui:VisualElement name="SpriteB" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
-                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Witch2.png?fileID=21300000&amp;guid=8a3182700b9500c478eab011ee567b4c&amp;type=3#Witch2&apos;);" />
-                <ui:Label tabindex="-1" text="B" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+            <ui:VisualElement name="Senna" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Player/Witch2.png?fileID=21300000&amp;guid=8a3182700b9500c478eab011ee567b4c&amp;type=3#Witch2&apos;);" />
+                <ui:Label tabindex="-1" text="Senna" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
             </ui:VisualElement>
-            <ui:VisualElement name="SpriteC" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
-                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Witch3.png?fileID=21300000&amp;guid=b2e3fb4d030ba714798baca84a758e27&amp;type=3#Witch3&apos;);" />
-                <ui:Label tabindex="-1" text="C" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+            <ui:VisualElement name="Ruby" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Player/Witch3.png?fileID=21300000&amp;guid=b2e3fb4d030ba714798baca84a758e27&amp;type=3#Witch3&apos;);" />
+                <ui:Label tabindex="-1" text="Ruby" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
             </ui:VisualElement>
         </ui:VisualElement>
         <ui:Label display-tooltip-when-elided="true" name="InstructionLabel" />
-        <ui:VisualElement name="SpritesM" class="sprite-row" style="background-color: rgba(0, 0, 0, 0); display: none;">
-            <ui:VisualElement name="SpriteD" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
-                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Wizard1.png?fileID=21300000&amp;guid=3f112b9354f0a7141a7336674cb9474e&amp;type=3#Wizard1&apos;);" />
-                <ui:Label tabindex="-1" text="D" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+        <ui:VisualElement name="SpritesM" class="sprite-row" style="background-color: rgba(0, 0, 0, 0);">
+            <ui:VisualElement name="Dexter" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Player/Wizard1.png?fileID=21300000&amp;guid=3f112b9354f0a7141a7336674cb9474e&amp;type=3#Wizard1&apos;);" />
+                <ui:Label tabindex="-1" text="Dexter" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
             </ui:VisualElement>
-            <ui:VisualElement name="SpriteB" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
-                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Wizard2.png?fileID=21300000&amp;guid=d6822fc729aa61843bd24ef17d0e3dc3&amp;type=3#Wizard2&apos;);" />
-                <ui:Label tabindex="-1" text="E" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+            <ui:VisualElement name="Emmet" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Player/Wizard2.png?fileID=21300000&amp;guid=d6822fc729aa61843bd24ef17d0e3dc3&amp;type=3#Wizard2&apos;);" />
+                <ui:Label tabindex="-1" text="Emmet" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
             </ui:VisualElement>
-            <ui:VisualElement name="SpriteC" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
-                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Wizard3.png?fileID=21300000&amp;guid=775db69bbad6ec04a8a41ee42ebaae88&amp;type=3#Wizard3&apos;);" />
-                <ui:Label tabindex="-1" text="F" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
+            <ui:VisualElement name="Oscar" class="sprite-preview" style="background-color: rgba(0, 0, 0, 0);">
+                <ui:VisualElement name="Sprite" class="sprite" style="background-color: rgba(0, 0, 0, 0); background-image: url(&apos;project://database/Assets/Sprites/Player/Wizard3.png?fileID=21300000&amp;guid=775db69bbad6ec04a8a41ee42ebaae88&amp;type=3#Wizard3&apos;);" />
+                <ui:Label tabindex="-1" text="Oscar" display-tooltip-when-elided="true" name="Label" class="sprite-label" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

@@ -21,11 +21,11 @@
     margin-top: 0;
     margin-bottom: 0;
     height: 96px;
-    background-image: url('project://database/Assets/Sprites/HealthBarBackground.png?fileID=21300000&guid=0b35d8d6522312c42a82b4d4fb79fa45&type=3#HealthBarBackground');
+    background-image: url('project://database/Assets/Sprites/HealthBar/HealthBarBackground.png?fileID=21300000&guid=0b35d8d6522312c42a82b4d4fb79fa45&type=3#HealthBarBackground');
 }
 
 .health-bar-fill {
-    background-image: url('project://database/Assets/Sprites/HealthBarForeground.png?fileID=21300000&guid=4d9da6976204af641bebf9740459f68f&type=3#HealthBarForeground');
+    background-image: url('project://database/Assets/Sprites/HealthBar/HealthBarForeground.png?fileID=21300000&guid=4d9da6976204af641bebf9740459f68f&type=3#HealthBarForeground');
     width: 100%;
     height: auto;
     flex-grow: 1;
@@ -66,19 +66,20 @@
     white-space: nowrap;
     margin-top: 32px;
     margin-bottom: 32px;
-    -unity-font-definition: url('project://database/Assets/Sprites/Tiles.asset?fileID=11400000&guid=cc321aea6ce130a4cb2673fe809027a2&type=2#Tiles');
+    -unity-font-definition: url('project://database/Assets/Sprites/Fonts/Tiles.asset?fileID=11400000&guid=cc321aea6ce130a4cb2673fe809027a2&type=2#Tiles');
 }
 
 .history-label {
     flex-grow: 1;
     font-size: 48px;
     -unity-text-align: upper-center;
-    -unity-font-definition: url('project://database/Assets/Sprites/Tiles.asset?fileID=11400000&guid=cc321aea6ce130a4cb2673fe809027a2&type=2#Tiles');
+    -unity-font-definition: url('project://database/Assets/Sprites/Fonts/Tiles.asset?fileID=11400000&guid=cc321aea6ce130a4cb2673fe809027a2&type=2#Tiles');
 }
 
 .sprite-row {
     height: 40%;
     flex-direction: row;
+    display: none;
 }
 
 .sprite {
