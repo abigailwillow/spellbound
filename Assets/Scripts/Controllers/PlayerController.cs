@@ -20,13 +20,13 @@ public class PlayerController : MonoBehaviourPun {
     public PlayerController Opponent => this.PlayerType == PlayerType.Local ? gameManager.RemotePlayer : gameManager.LocalPlayer;
     private GameManager gameManager => GameManager.Instance;
     private InputController input;
-    private int spriteIndex;
+    private int spriteIndex = -1;
     private string exit = "EXIT";
     /// <summary>The index of the sprite to use, automatically sets and syncs the sprite</summary>
     public int SpriteIndex {
         get => spriteIndex;
         set {
-            if (spriteIndex == value) return;
+            if (this.spriteIndex == value) return;
             this.spriteIndex = value;
             this.GetComponent<SpriteRenderer>().sprite = this.sprites[value];
             this.SyncSpriteIndex();
@@ -52,9 +52,7 @@ public class PlayerController : MonoBehaviourPun {
     }
 
     private void Start() {
-        if (PlayerType == PlayerType.Local) {
-            this.SpriteIndex = PlayerPrefs.GetInt("SpriteIndex", 0);
-        }
+        if (PlayerType == PlayerType.Local) this.SpriteIndex = PlayerPrefs.GetInt("SpriteIndex", 0);
 
         this.TryGetComponent<InputController>(out input);
         this.gameManager.AddPlayer(this);
