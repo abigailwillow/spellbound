@@ -78,11 +78,6 @@ public class GameManager : MonoBehaviourPunCallbacks {
 
         // Create the menu state machine
         this.menuStateMachine = new MenuStateMachine(this);
-        
-        // Check if player has completed the tutorial, if not start the tutorial
-        if (PlayerPrefs.GetInt("CompletedTutorial", 0) == 0) {
-            this.menuStateMachine.SetMenuState(MenuState.Tutorial);
-        }
     }
 
     private void Update() {
@@ -129,6 +124,9 @@ public class GameManager : MonoBehaviourPunCallbacks {
             // If any other state, go back to the menu by default
             PhotonNetwork.CreateRoom(null, new Photon.Realtime.RoomOptions { MaxPlayers = 1, IsOpen = false });
             this.SetGameState(GameState.Menu);
+            
+            // Check if player has completed the tutorial, if not start the tutorial
+            if (PlayerPrefs.GetInt("CompletedTutorial", 0) == 0) this.menuStateMachine.SetMenuState(MenuState.Tutorial);
         }
     }
 
